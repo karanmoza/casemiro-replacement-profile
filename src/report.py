@@ -86,7 +86,9 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
     category_scores.to_csv(category_path, index=False)
     sensitivity.to_csv(sensitivity_path, index=False)
     filtered_out.to_csv(filtered_out_path, index=False)
-    context_sources = pd.DataFrame.from_dict(PLAYER_CONTEXT_MAY_2026, orient="index").reset_index(names="player")
+    context_sources = pd.DataFrame.from_dict(PLAYER_CONTEXT_MAY_2026, orient="index").reset_index(
+        names="player"
+    )
     if "is_target_candidate" in context_sources.columns:
         context_sources["is_target_candidate"] = context_sources["is_target_candidate"].where(
             context_sources["is_target_candidate"].notna(), True
@@ -95,17 +97,25 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
     _make_scoring_methodology_table().to_csv(methodology_path, index=False)
 
     chart_paths = {
-        "ranked_bar": save_ranked_score_bar(shortlist, CHART_DIR / "ranked_control_midfielder_score.png"),
-        "category_heatmap": save_category_heatmap(category_scores, CHART_DIR / "category_heatmap.png"),
+        "ranked_bar": save_ranked_score_bar(
+            shortlist, CHART_DIR / "ranked_control_midfielder_score.png"
+        ),
+        "category_heatmap": save_category_heatmap(
+            category_scores, CHART_DIR / "category_heatmap.png"
+        ),
         "radar": save_radar_chart(scored, CHART_DIR / "casemiro_candidate_radar.png"),
-        "scatter": save_security_defence_scatter(scored, CHART_DIR / "security_vs_defensive_floor.png"),
+        "scatter": save_security_defence_scatter(
+            scored, CHART_DIR / "security_vs_defensive_floor.png"
+        ),
         "sensitivity": save_sensitivity_chart(sensitivity, CHART_DIR / "sensitivity_analysis.png"),
     }
 
     pdf_path = REPORT_DIR / "casemiro_replacement_summary.pdf"
     save_recruitment_summary_pdf(scored, shortlist, category_scores, sensitivity, pdf_path)
     html_path = REPORT_DIR / "casemiro_replacement_report.html"
-    save_html_report(scored, shortlist, category_scores, sensitivity, filtered_out, chart_paths, html_path)
+    save_html_report(
+        scored, shortlist, category_scores, sensitivity, filtered_out, chart_paths, html_path
+    )
 
     return {
         "scored_players": scored_path,
@@ -136,14 +146,18 @@ def save_html_report(
     candidates = filter_target_candidates(scored)
     references = scored[scored["player"].isin(["Casemiro", "Manuel Ugarte"])].copy()
     top = candidates.iloc[0]
-    casemiro_def = references.loc[references["player"].eq("Casemiro"), "defensive_protection"].iloc[0]
+    casemiro_def = references.loc[references["player"].eq("Casemiro"), "defensive_protection"].iloc[
+        0
+    ]
     high_security = candidates[candidates["possession_security"] >= 70]
     high_defence = candidates[
         (candidates["control_midfielder_score"] >= 50)
         & (candidates["defensive_protection"] >= casemiro_def)
     ]
 
-    chart_rel = {name: rel_path(chart_path, path.parent) for name, chart_path in chart_paths.items()}
+    chart_rel = {
+        name: rel_path(chart_path, path.parent) for name, chart_path in chart_paths.items()
+    }
     shortlist_table = shortlist[
         [
             "rank",
@@ -186,9 +200,23 @@ def save_html_report(
     watchlist_table.columns = ["Player", "Club", "Score", "Defence", "Main Risk", "Risk Score"]
 
     reference_table = references[
-        ["player", "age", "defensive_protection", "transition_control", "possession_security", "progressive_value"]
+        [
+            "player",
+            "age",
+            "defensive_protection",
+            "transition_control",
+            "possession_security",
+            "progressive_value",
+        ]
     ].copy()
-    reference_table.columns = ["Reference", "Age", "Defence", "Transition", "Security", "Progression"]
+    reference_table.columns = [
+        "Reference",
+        "Age",
+        "Defence",
+        "Transition",
+        "Security",
+        "Progression",
+    ]
 
     html = f"""<!doctype html>
 <html lang="en">
@@ -610,12 +638,24 @@ def save_recruitment_summary_pdf(
 def _new_slide(title: str, subtitle: str = "") -> plt.Figure:
     fig = plt.figure(figsize=(13.33, 7.5))
     fig.patch.set_facecolor("#F3F4F6")
-    fig.add_artist(plt.Rectangle((0, 0.885), 1, 0.115, transform=fig.transFigure, color="#111827", zorder=0))
-    fig.add_artist(plt.Rectangle((0, 0.885), 0.018, 0.115, transform=fig.transFigure, color=COLOR_PRIMARY, zorder=1))
+    fig.add_artist(
+        plt.Rectangle((0, 0.885), 1, 0.115, transform=fig.transFigure, color="#111827", zorder=0)
+    )
+    fig.add_artist(
+        plt.Rectangle(
+            (0, 0.885), 0.018, 0.115, transform=fig.transFigure, color=COLOR_PRIMARY, zorder=1
+        )
+    )
     fig.text(0.045, 0.945, title, fontsize=20, weight="bold", color="white")
     if subtitle:
         fig.text(0.045, 0.908, subtitle, fontsize=10.3, color="#D1D5DB")
-    fig.text(0.045, 0.04, "Casemiro Replacement Profile | public-data screen | as of May 6, 2026", fontsize=7.5, color="#6B7280")
+    fig.text(
+        0.045,
+        0.04,
+        "Casemiro Replacement Profile | public-data screen | as of May 6, 2026",
+        fontsize=7.5,
+        color="#6B7280",
+    )
     fig.text(0.865, 0.04, "Not proprietary scouting data", fontsize=7.5, color="#6B7280")
     return fig
 
@@ -644,26 +684,87 @@ def _save_slide(pdf: PdfPages, fig: plt.Figure) -> None:
 
 def _draw_kpi(ax: plt.Axes, title: str, value: str, note: str, color: str = COLOR_ACCENT) -> None:
     ax.axis("off")
-    ax.add_patch(plt.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor="white", edgecolor="#D8DEE6", lw=1.0))
-    ax.add_patch(plt.Rectangle((0, 0), 0.018, 1, transform=ax.transAxes, facecolor=color, edgecolor=color, lw=0))
-    ax.text(0.07, 0.82, title.upper(), transform=ax.transAxes, fontsize=8.2, weight="bold", color="#6B7280", va="center")
+    ax.add_patch(
+        plt.Rectangle(
+            (0, 0), 1, 1, transform=ax.transAxes, facecolor="white", edgecolor="#D8DEE6", lw=1.0
+        )
+    )
+    ax.add_patch(
+        plt.Rectangle(
+            (0, 0), 0.018, 1, transform=ax.transAxes, facecolor=color, edgecolor=color, lw=0
+        )
+    )
+    ax.text(
+        0.07,
+        0.82,
+        title.upper(),
+        transform=ax.transAxes,
+        fontsize=8.2,
+        weight="bold",
+        color="#6B7280",
+        va="center",
+    )
     ax.text(0.07, 0.54, value, transform=ax.transAxes, fontsize=18, weight="bold", color="#111827")
-    ax.text(0.07, 0.25, "\n".join(wrap(note, 35)), transform=ax.transAxes, fontsize=8.2, color="#4B5563", va="top")
+    ax.text(
+        0.07,
+        0.25,
+        "\n".join(wrap(note, 35)),
+        transform=ax.transAxes,
+        fontsize=8.2,
+        color="#4B5563",
+        va="top",
+    )
 
 
-def _add_explanation_box(fig: plt.Figure, xywh: list[float], title: str, bullets: list[str]) -> None:
+def _add_explanation_box(
+    fig: plt.Figure, xywh: list[float], title: str, bullets: list[str]
+) -> None:
     ax = fig.add_axes(xywh)
     ax.axis("off")
-    ax.add_patch(plt.Rectangle((0, 0), 1, 1, transform=ax.transAxes, facecolor="white", edgecolor="#D8DEE6", lw=1.0))
-    ax.add_patch(plt.Rectangle((0, 0.88), 1, 0.12, transform=ax.transAxes, facecolor="#F9FAFB", edgecolor="#D8DEE6", lw=0.8))
-    ax.text(0.045, 0.94, title, transform=ax.transAxes, fontsize=10.5, weight="bold", color="#111827", va="center")
+    ax.add_patch(
+        plt.Rectangle(
+            (0, 0), 1, 1, transform=ax.transAxes, facecolor="white", edgecolor="#D8DEE6", lw=1.0
+        )
+    )
+    ax.add_patch(
+        plt.Rectangle(
+            (0, 0.88),
+            1,
+            0.12,
+            transform=ax.transAxes,
+            facecolor="#F9FAFB",
+            edgecolor="#D8DEE6",
+            lw=0.8,
+        )
+    )
+    ax.text(
+        0.045,
+        0.94,
+        title,
+        transform=ax.transAxes,
+        fontsize=10.5,
+        weight="bold",
+        color="#111827",
+        va="center",
+    )
     y = 0.80
     for bullet in bullets:
-        ax.text(0.06, y, "\n".join(wrap(f"- {bullet}", 42)), transform=ax.transAxes, fontsize=8.5, color="#1F2933", va="top", linespacing=1.25)
+        ax.text(
+            0.06,
+            y,
+            "\n".join(wrap(f"- {bullet}", 42)),
+            transform=ax.transAxes,
+            fontsize=8.5,
+            color="#1F2933",
+            va="top",
+            linespacing=1.25,
+        )
         y -= 0.18 + 0.035 * max(0, len(wrap(bullet, 42)) - 2)
 
 
-def _render_table(ax: plt.Axes, data: pd.DataFrame, col_widths: list[float] | None = None, font_size: float = 8.2) -> None:
+def _render_table(
+    ax: plt.Axes, data: pd.DataFrame, col_widths: list[float] | None = None, font_size: float = 8.2
+) -> None:
     ax.axis("off")
     table = ax.table(
         cellText=data.values,
@@ -692,16 +793,36 @@ def _add_executive_slide(pdf: PdfPages, candidates: pd.DataFrame, references: pd
         "The published shortlist applies a light defensive-protection gate to remove pure control profiles with limited ball-winning evidence.",
     )
     top = candidates.iloc[0]
-    casemiro_defensive = references.loc[references["player"].eq("Casemiro"), "defensive_protection"].iloc[0]
+    casemiro_defensive = references.loc[
+        references["player"].eq("Casemiro"), "defensive_protection"
+    ].iloc[0]
     high_security = candidates[candidates["possession_security"] >= 70]
     high_defence = candidates[
         (candidates["control_midfielder_score"] >= 50)
         & (candidates["defensive_protection"] >= casemiro_defensive)
     ]
 
-    _draw_kpi(fig.add_axes([0.055, 0.70, 0.27, 0.15]), "Top Weighted Screen", top["player"], f"{top['squad']} | score {top['control_midfielder_score']:.1f} | age {int(top['age'])}", COLOR_PRIMARY)
-    _draw_kpi(fig.add_axes([0.365, 0.70, 0.27, 0.15]), "Published Control Profiles", f"{len(high_security)} players", "Gated shortlist candidates with possession-security score of 70+; these profiles help avoid repeat emergency defending.", COLOR_ACCENT)
-    _draw_kpi(fig.add_axes([0.675, 0.70, 0.27, 0.15]), "Defensive Reference", f"{len(high_defence)} players", "Priority candidates above Casemiro's defensive-protection reference score.", "#0F766E")
+    _draw_kpi(
+        fig.add_axes([0.055, 0.70, 0.27, 0.15]),
+        "Top Weighted Screen",
+        top["player"],
+        f"{top['squad']} | score {top['control_midfielder_score']:.1f} | age {int(top['age'])}",
+        COLOR_PRIMARY,
+    )
+    _draw_kpi(
+        fig.add_axes([0.365, 0.70, 0.27, 0.15]),
+        "Published Control Profiles",
+        f"{len(high_security)} players",
+        "Gated shortlist candidates with possession-security score of 70+; these profiles help avoid repeat emergency defending.",
+        COLOR_ACCENT,
+    )
+    _draw_kpi(
+        fig.add_axes([0.675, 0.70, 0.27, 0.15]),
+        "Defensive Reference",
+        f"{len(high_defence)} players",
+        "Priority candidates above Casemiro's defensive-protection reference score.",
+        "#0F766E",
+    )
 
     ax_text = fig.add_axes([0.055, 0.255, 0.46, 0.39])
     ax_text.axis("off")
@@ -716,11 +837,27 @@ def _add_executive_slide(pdf: PdfPages, candidates: pd.DataFrame, references: pd
     y = 0.84
     for idx, bullet in enumerate(bullets):
         wrapped = wrap(bullet, 68)
-        ax_text.text(0.02, y, f"{idx + 1}. " + "\n   ".join(wrapped), fontsize=8.5, color="#1F2933", va="top", linespacing=1.18)
+        ax_text.text(
+            0.02,
+            y,
+            f"{idx + 1}. " + "\n   ".join(wrapped),
+            fontsize=8.5,
+            color="#1F2933",
+            va="top",
+            linespacing=1.18,
+        )
         y -= 0.105 + 0.035 * len(wrapped)
 
     ax_refs = fig.add_axes([0.55, 0.335, 0.38, 0.23])
-    ref_cols = ["player", "squad", "age", "defensive_protection", "transition_control", "possession_security", "progressive_value"]
+    ref_cols = [
+        "player",
+        "squad",
+        "age",
+        "defensive_protection",
+        "transition_control",
+        "possession_security",
+        "progressive_value",
+    ]
     ref_table = references[ref_cols].copy()
     ref_table["squad"] = ref_table["squad"].replace({"Manchester United": "Man United"})
     ref_table.columns = ["Reference", "Club", "Age", "Def.", "Trans.", "Poss.", "Prog."]
@@ -736,7 +873,14 @@ def _add_executive_slide(pdf: PdfPages, candidates: pd.DataFrame, references: pd
     )
 
     fig.text(0.055, 0.17, "Core line", fontsize=10.5, weight="bold", color=COLOR_PRIMARY)
-    fig.text(0.055, 0.13, "The next signing should not only win duels. It should prevent some of them from happening.", fontsize=15, weight="bold", color="#111827")
+    fig.text(
+        0.055,
+        0.13,
+        "The next signing should not only win duels. It should prevent some of them from happening.",
+        fontsize=15,
+        weight="bold",
+        color="#111827",
+    )
     _save_slide(pdf, fig)
 
 
@@ -759,16 +903,36 @@ def _add_methodology_slide(pdf: PdfPages) -> None:
     ax_text = fig.add_axes([0.46, 0.19, 0.45, 0.63])
     ax_text.axis("off")
     sections = [
-        ("1. Candidate Pool", "EPL, La Liga, Primeira Liga, Bundesliga, Ligue 1, and Serie A only. United players are references, not targets. Arsenal, Chelsea, Liverpool, and Manchester City midfielders are excluded. The defensive gate is intentionally low because this is a complementary-control screen, not only a defensive-destroyer screen."),
-        ("2. Metric Scoring", "Raw public stats are converted to per-90 rates where needed, then normalized to 0-100 percentile-style scores inside this screened pool. A 50 score is roughly middle-of-pool, not an absolute football truth."),
-        ("3. Risk Metrics", "Fouls, cards, miscontrols, dispossessions, and turnover rates are inverted: lower risk receives the better score."),
-        ("4. Data Caveat", "StatsBomb open data demonstrates event-data role logic; FBref-style/public aggregate statistics drive the broader screen, with supplements for non-Big-Five leagues such as Portugal."),
+        (
+            "1. Candidate Pool",
+            "EPL, La Liga, Primeira Liga, Bundesliga, Ligue 1, and Serie A only. United players are references, not targets. Arsenal, Chelsea, Liverpool, and Manchester City midfielders are excluded. The defensive gate is intentionally low because this is a complementary-control screen, not only a defensive-destroyer screen.",
+        ),
+        (
+            "2. Metric Scoring",
+            "Raw public stats are converted to per-90 rates where needed, then normalized to 0-100 percentile-style scores inside this screened pool. A 50 score is roughly middle-of-pool, not an absolute football truth.",
+        ),
+        (
+            "3. Risk Metrics",
+            "Fouls, cards, miscontrols, dispossessions, and turnover rates are inverted: lower risk receives the better score.",
+        ),
+        (
+            "4. Data Caveat",
+            "StatsBomb open data demonstrates event-data role logic; FBref-style/public aggregate statistics drive the broader screen, with supplements for non-Big-Five leagues such as Portugal.",
+        ),
     ]
     y = 0.98
     for header, text in sections:
         ax_text.text(0, y, header, fontsize=10.8, weight="bold", color="#111827", va="top")
         y -= 0.055
-        ax_text.text(0.02, y, "\n".join(wrap(text, 88)), fontsize=8.8, color="#1F2933", va="top", linespacing=1.28)
+        ax_text.text(
+            0.02,
+            y,
+            "\n".join(wrap(text, 88)),
+            fontsize=8.8,
+            color="#1F2933",
+            va="top",
+            linespacing=1.28,
+        )
         y -= 0.17
     _add_explanation_box(
         fig,
@@ -803,12 +967,22 @@ def _add_ranked_score_slide(pdf: PdfPages, candidates: pd.DataFrame) -> None:
     weighted = stack.copy()
     for col, weight in WEIGHTS.items():
         weighted[col] = weighted[col] * weight
-    weighted.plot(kind="barh", stacked=True, ax=ax_stack, color=[COLOR_PRIMARY, COLOR_ACCENT, "#0F766E", "#F59E0B", "#6B7280"])
+    weighted.plot(
+        kind="barh",
+        stacked=True,
+        ax=ax_stack,
+        color=[COLOR_PRIMARY, COLOR_ACCENT, "#0F766E", "#F59E0B", "#6B7280"],
+    )
     ax_stack.invert_yaxis()
     ax_stack.set_xlabel("Weighted score contribution")
     ax_stack.set_ylabel("")
     ax_stack.set_title("B. Score composition, top 8", fontsize=12, weight="bold")
-    ax_stack.legend([CATEGORY_LABELS[col] for col in weighted.columns], loc="lower right", fontsize=7, frameon=False)
+    ax_stack.legend(
+        [CATEGORY_LABELS[col] for col in weighted.columns],
+        loc="lower right",
+        fontsize=7,
+        frameon=False,
+    )
     _add_explanation_box(
         fig,
         [0.06, 0.095, 0.84, 0.105],
@@ -821,7 +995,9 @@ def _add_ranked_score_slide(pdf: PdfPages, candidates: pd.DataFrame) -> None:
     _save_slide(pdf, fig)
 
 
-def _add_control_matrix_slide(pdf: PdfPages, candidates: pd.DataFrame, references: pd.DataFrame) -> None:
+def _add_control_matrix_slide(
+    pdf: PdfPages, candidates: pd.DataFrame, references: pd.DataFrame
+) -> None:
     fig = _new_slide(
         "Control Matrix: Who Adds Security Without Losing the Defensive Floor?",
         "Possession security is the control axis; defensive protection is the floor. Bubble size reflects progressive value.",
@@ -829,7 +1005,9 @@ def _add_control_matrix_slide(pdf: PdfPages, candidates: pd.DataFrame, reference
     ax = fig.add_axes([0.065, 0.17, 0.62, 0.66])
     ax.set_facecolor("white")
     data = candidates.head(16).copy()
-    casemiro_defensive = references.loc[references["player"].eq("Casemiro"), "defensive_protection"].iloc[0]
+    casemiro_defensive = references.loc[
+        references["player"].eq("Casemiro"), "defensive_protection"
+    ].iloc[0]
     control_line = 70
     ax.axvline(control_line, color="#9CA3AF", lw=1.1, ls="--")
     ax.axhline(casemiro_defensive, color="#9CA3AF", lw=1.1, ls="--")
@@ -848,14 +1026,37 @@ def _add_control_matrix_slide(pdf: PdfPages, candidates: pd.DataFrame, reference
     for _, row in data.iterrows():
         ha = "right" if row["possession_security"] > 82 else "left"
         xoff = -1.0 if ha == "right" else 0.8
-        ax.text(row["possession_security"] + xoff, row["defensive_protection"] + 0.7, row["player"], fontsize=8.0, ha=ha)
+        ax.text(
+            row["possession_security"] + xoff,
+            row["defensive_protection"] + 0.7,
+            row["player"],
+            fontsize=8.0,
+            ha=ha,
+        )
 
     for _, row in references.iterrows():
-        ax.scatter(row["possession_security"], row["defensive_protection"], s=180, color=COLOR_PRIMARY, marker="D", edgecolor="white", linewidth=1.2)
-        ax.text(row["possession_security"] + 1, row["defensive_protection"] - 2, row["player"], fontsize=8.2, weight="bold", color=COLOR_PRIMARY)
+        ax.scatter(
+            row["possession_security"],
+            row["defensive_protection"],
+            s=180,
+            color=COLOR_PRIMARY,
+            marker="D",
+            edgecolor="white",
+            linewidth=1.2,
+        )
+        ax.text(
+            row["possession_security"] + 1,
+            row["defensive_protection"] - 2,
+            row["player"],
+            fontsize=8.2,
+            weight="bold",
+            color=COLOR_PRIMARY,
+        )
 
     ax.text(82, 98, "Control target zone", fontsize=10, weight="bold", color="#166534")
-    ax.text(2, casemiro_defensive + 2.5, "Casemiro defensive reference", fontsize=8.5, color="#4B5563")
+    ax.text(
+        2, casemiro_defensive + 2.5, "Casemiro defensive reference", fontsize=8.5, color="#4B5563"
+    )
     ax.text(5, 98, "Duel-heavy protectors", fontsize=9, color="#92400E")
     ax.text(70, 8, "Controllers needing cover", fontsize=9, color="#1D4ED8")
     ax.set_xlim(0, 105)
@@ -910,7 +1111,9 @@ def _add_heatmap_slide(pdf: PdfPages, category_scores: pd.DataFrame) -> None:
     _save_slide(pdf, fig)
 
 
-def _add_sensitivity_slide(pdf: PdfPages, candidates: pd.DataFrame, sensitivity: pd.DataFrame) -> None:
+def _add_sensitivity_slide(
+    pdf: PdfPages, candidates: pd.DataFrame, sensitivity: pd.DataFrame
+) -> None:
     fig = _new_slide(
         "Sensitivity and Availability View",
         "A better shortlist is robust to reasonable weight changes and honest about cost/minutes context.",
@@ -920,7 +1123,13 @@ def _add_sensitivity_slide(pdf: PdfPages, candidates: pd.DataFrame, sensitivity:
         .agg(best_rank="min", worst_rank="max")
         .assign(rank_range=lambda df: df["worst_rank"] - df["best_rank"])
         .reset_index()
-        .merge(candidates[["player", "control_midfielder_score", "age", "minutes", "market_value_m_eur"]], on="player", how="left")
+        .merge(
+            candidates[
+                ["player", "control_midfielder_score", "age", "minutes", "market_value_m_eur"]
+            ],
+            on="player",
+            how="left",
+        )
         .sort_values(["best_rank", "rank_range"])
         .head(12)
     )
@@ -928,7 +1137,9 @@ def _add_sensitivity_slide(pdf: PdfPages, candidates: pd.DataFrame, sensitivity:
     ax1 = fig.add_axes([0.06, 0.25, 0.34, 0.55])
     ax1.set_facecolor("white")
     plot_df = stability.sort_values("best_rank", ascending=False)
-    ax1.hlines(plot_df["player"], plot_df["best_rank"], plot_df["worst_rank"], color="#9CA3AF", lw=5)
+    ax1.hlines(
+        plot_df["player"], plot_df["best_rank"], plot_df["worst_rank"], color="#9CA3AF", lw=5
+    )
     ax1.scatter(plot_df["best_rank"], plot_df["player"], color="#0F766E", s=55, label="Best")
     ax1.scatter(plot_df["worst_rank"], plot_df["player"], color=COLOR_PRIMARY, s=55, label="Worst")
     ax1.set_xlabel("Rank across weight scenarios")
@@ -939,7 +1150,15 @@ def _add_sensitivity_slide(pdf: PdfPages, candidates: pd.DataFrame, sensitivity:
     ax2 = fig.add_axes([0.48, 0.25, 0.31, 0.55])
     ax2.set_facecolor("white")
     sizes = 60 + (stability["minutes"] / stability["minutes"].max()) * 520
-    ax2.scatter(stability["age"], stability["market_value_m_eur"], s=sizes, color=COLOR_ACCENT, alpha=0.75, edgecolor="white", linewidth=1)
+    ax2.scatter(
+        stability["age"],
+        stability["market_value_m_eur"],
+        s=sizes,
+        color=COLOR_ACCENT,
+        alpha=0.75,
+        edgecolor="white",
+        linewidth=1,
+    )
     for _, row in stability.iterrows():
         ax2.text(row["age"] + 0.12, row["market_value_m_eur"] + 0.6, row["player"], fontsize=7.8)
     ax2.axvspan(21, 27, color="#DCFCE7", alpha=0.35)
@@ -977,8 +1196,20 @@ def _add_candidate_notes_slide(pdf: PdfPages, shortlist: pd.DataFrame) -> None:
             "availability_note",
         ]
     ].copy()
-    table.columns = ["#", "Player", "Club", "Age", "Score", "Def.", "Poss.", "Prog.", "Analyst note"]
-    table["Analyst note"] = table["Analyst note"].apply(lambda value: "\n".join(wrap(str(value), 34)))
+    table.columns = [
+        "#",
+        "Player",
+        "Club",
+        "Age",
+        "Score",
+        "Def.",
+        "Poss.",
+        "Prog.",
+        "Analyst note",
+    ]
+    table["Analyst note"] = table["Analyst note"].apply(
+        lambda value: "\n".join(wrap(str(value), 34))
+    )
     ax = fig.add_axes([0.04, 0.17, 0.92, 0.68])
     _render_table(ax, table, [0.04, 0.14, 0.15, 0.05, 0.07, 0.06, 0.06, 0.06, 0.31], 7.3)
     fig.text(

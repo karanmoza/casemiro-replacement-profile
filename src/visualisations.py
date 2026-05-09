@@ -47,7 +47,9 @@ def save_ranked_score_bar(shortlist: pd.DataFrame, path: str | Path) -> Path:
     path = Path(path)
     ordered = shortlist.sort_values("control_midfielder_score", ascending=True)
     fig, ax = plt.subplots(figsize=(11, 8))
-    colors = [COLOR_PRIMARY if player == CASEMIRO_NAME else COLOR_ACCENT for player in ordered["player"]]
+    colors = [
+        COLOR_PRIMARY if player == CASEMIRO_NAME else COLOR_ACCENT for player in ordered["player"]
+    ]
     ax.barh(ordered["player"], ordered["control_midfielder_score"], color=colors)
     ax.set_xlabel("Control Midfielder Score")
     ax.set_ylabel("")
@@ -59,6 +61,7 @@ def save_ranked_score_bar(shortlist: pd.DataFrame, path: str | Path) -> Path:
     fig.savefig(path, dpi=180, bbox_inches="tight")
     plt.close(fig)
     return path
+
 
 def save_category_heatmap(category_scores: pd.DataFrame, path: str | Path, top_n: int = 15) -> Path:
     """Save category heatmap for shortlisted players."""
@@ -110,7 +113,9 @@ def save_radar_chart(scored: pd.DataFrame, path: str | Path, candidate_count: in
     for idx, (_, row) in enumerate(radar_df.iterrows()):
         values = row[category_cols].astype(float).tolist()
         values += values[:1]
-        ax.plot(angles, values, linewidth=2.2, label=row["player"], color=palette[idx % len(palette)])
+        ax.plot(
+            angles, values, linewidth=2.2, label=row["player"], color=palette[idx % len(palette)]
+        )
         ax.fill(angles, values, alpha=0.08, color=palette[idx % len(palette)])
 
     ax.set_xticks(angles[:-1])
@@ -170,7 +175,9 @@ def save_sensitivity_chart(sensitivity: pd.DataFrame, path: str | Path) -> Path:
 
     setup_style()
     path = Path(path)
-    pivot = sensitivity.pivot_table(index="player", columns="scenario", values="rank", aggfunc="min")
+    pivot = sensitivity.pivot_table(
+        index="player", columns="scenario", values="rank", aggfunc="min"
+    )
     pivot = pivot.loc[pivot.min(axis=1).sort_values().index]
     fig, ax = plt.subplots(figsize=(12, 8))
     sns.heatmap(

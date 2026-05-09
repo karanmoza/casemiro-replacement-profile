@@ -19,7 +19,14 @@ from .metrics import percentile_normalize, prepare_metrics
 
 
 def _score_metric(df: pd.DataFrame, metric: str) -> pd.Series:
-    """Return a 0-100 score for one metric, respecting inverse columns."""
+    """Return a 0-100 score for one metric.
+
+    Normal public metrics are percentile-normalized with higher values treated
+    as better. Metrics ending in `_inv`, plus the engineered age and minutes
+    scores, are already expressed on a 0-100 scale and are only clipped.
+    Missing metrics receive a neutral score so optional public fields do not
+    break the pipeline.
+    """
 
     if metric not in df.columns:
         return pd.Series(50.0, index=df.index)
@@ -30,10 +37,14 @@ def _score_metric(df: pd.DataFrame, metric: str) -> pd.Series:
 
 
 def calculate_category_scores(
-    df: pd.DataFrame,
-    category_metrics: dict[str, list[str]] | None = None,
+    df: pd.DataFrame, category_metrics: dict[str, list[str]] | None = None,
 ) -> pd.DataFrame:
-    """Calculate category scores as the mean of normalized metric scores."""
+    """Calculate category scores as the mean of their normalized metrics.
+
+    Each category deliberately remains simple and auditable. This is a public
+    recruitment screen, not a proprietary model, so category scores should be
+    easy to trace back to their component metrics.
+    """
 
     category_metrics = category_metrics or CATEGORY_METRICS
     out = df.copy()
@@ -48,7 +59,12 @@ def calculate_weighted_score(
     weights: dict[str, float] | None = None,
     score_col: str = "control_midfielder_score",
 ) -> pd.DataFrame:
-    """Calculate weighted total Control Midfielder Score."""
+    """Calculate the weighted total Control Midfielder Score.
+
+    Weights are normalized before scoring, which allows sensitivity scenarios
+    to increase or decrease a category weight without requiring the caller to
+    manually rebalance every other category.
+    """
 
     weights = weights or WEIGHTS
     normalized_weight_sum = sum(weights.values())
@@ -62,7 +78,11 @@ def calculate_weighted_score(
 
 
 def build_scoring_table(df: pd.DataFrame, weights: dict[str, float] | None = None) -> pd.DataFrame:
-    """Create the full scored player table from raw public stats."""
+    """Create the full scored player table from raw public stats.
+
+    This is the main pipeline entry point: engineer per-90 and risk metrics,
+    score each category, then calculate the total weighted score.
+    """
 
     engineered = prepare_metrics(df)
     categorized = calculate_category_scores(engineered)
@@ -73,10 +93,14 @@ def build_scoring_table(df: pd.DataFrame, weights: dict[str, float] | None = Non
 
 
 def filter_target_candidates(
-    scored: pd.DataFrame,
-    require_balanced_profile: bool = REQUIRE_ABOVE_MIN_EVERY_CATEGORY,
+    scored: pd.DataFrame, require_balanced_profile: bool = REQUIRE_ABOVE_MIN_EVERY_CATEGORY,
 ) -> pd.DataFrame:
-    """Apply the May 2026 recruitment-pool constraints."""
+    """Apply the May 2026 recruitment-pool constraints.
+
+    The defensive gate is intentionally light. It removes pure control profiles
+    with limited ball-winning evidence, while keeping the project aligned with
+    the thesis that United need control as well as duel-winning.
+    """
 
     out = scored.copy()
     if "is_target_candidate" in out.columns:
@@ -94,7 +118,11 @@ def filter_target_candidates(
 
 
 def make_filtered_out_watchlist(scored: pd.DataFrame) -> pd.DataFrame:
-    """Return otherwise eligible players removed by the defensive floor gate."""
+    """Return otherwise eligible players removed by the defensive gate.
+
+    Keeping this export makes the screening decision auditable: readers can see
+    which attractive public-data profiles were excluded and why.
+    """
 
     full_pool = scored.copy()
     if "is_target_candidate" in full_pool.columns:
@@ -160,7 +188,12 @@ def sensitivity_analysis(
     swing: float = 0.10,
     top_n: int = SHORTLIST_SIZE,
 ) -> pd.DataFrame:
-    """Test how top-candidate ranks move when category weights shift +/- swing."""
+    """Test how top-candidate ranks move when category weights shift.
+
+    The output is designed for defensibility rather than optimization. It
+    shows whether the shortlist is robust to reasonable category-weight changes
+    or whether one assumption drives the ranking too heavily.
+    """
 
     base_weights = base_weights or WEIGHTS
     scenarios = [("Base weights", base_weights)]

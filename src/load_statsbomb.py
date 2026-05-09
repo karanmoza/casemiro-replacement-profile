@@ -69,17 +69,19 @@ def engineer_event_control_metrics(events: pd.DataFrame) -> pd.DataFrame:
     player_col = "player"
     type_col = "type"
     if isinstance(df[type_col].iloc[0], dict):
-        df[type_col] = df[type_col].apply(lambda value: value.get("name") if isinstance(value, dict) else value)
+        df[type_col] = df[type_col].apply(
+            lambda value: value.get("name") if isinstance(value, dict) else value
+        )
 
     grouped = df.groupby(player_col)
     out = pd.DataFrame({"player": grouped.size().index})
-    out["sb_ball_recoveries"] = out["player"].map(
-        df[df[type_col].eq("Ball Recovery")].groupby(player_col).size()
-    ).fillna(0)
-    out["sb_pressures"] = out["player"].map(
-        df[df[type_col].eq("Pressure")].groupby(player_col).size()
-    ).fillna(0)
-    out["sb_interceptions"] = out["player"].map(
-        df[df[type_col].eq("Interception")].groupby(player_col).size()
-    ).fillna(0)
+    out["sb_ball_recoveries"] = (
+        out["player"].map(df[df[type_col].eq("Ball Recovery")].groupby(player_col).size()).fillna(0)
+    )
+    out["sb_pressures"] = (
+        out["player"].map(df[df[type_col].eq("Pressure")].groupby(player_col).size()).fillna(0)
+    )
+    out["sb_interceptions"] = (
+        out["player"].map(df[df[type_col].eq("Interception")].groupby(player_col).size()).fillna(0)
+    )
     return out

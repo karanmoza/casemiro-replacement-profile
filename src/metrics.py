@@ -9,11 +9,14 @@ from .config import DIRECT_PERCENT_COLUMNS, INVERSE_RAW_METRICS, RAW_COUNT_COLUM
 
 
 def calculate_per90(
-    df: pd.DataFrame,
-    count_columns: list[str] | None = None,
-    minutes_col: str = "minutes",
+    df: pd.DataFrame, count_columns: list[str] | None = None, minutes_col: str = "minutes",
 ) -> pd.DataFrame:
-    """Create per-90 columns for raw counting stats."""
+    """Create per-90 columns for raw counting stats.
+
+    Public aggregate providers often report season totals. The scoring model
+    compares players with different playing time, so count metrics are first
+    converted to per-90 rates using the available minutes column.
+    """
 
     out = df.copy()
     count_columns = count_columns or RAW_COUNT_COLUMNS
@@ -25,7 +28,11 @@ def calculate_per90(
 
 
 def percentile_normalize(series: pd.Series) -> pd.Series:
-    """Convert a numeric series to 0-100 percentile scores where high is good."""
+    """Convert a numeric series to 0-100 percentile scores where high is good.
+
+    Missing values are filled with the median so that sparse public fields do
+    not automatically push a player to the top or bottom of the screen.
+    """
 
     numeric = pd.to_numeric(series, errors="coerce")
     if numeric.notna().sum() == 0:
@@ -35,7 +42,11 @@ def percentile_normalize(series: pd.Series) -> pd.Series:
 
 
 def inverse_percentile_normalize(series: pd.Series) -> pd.Series:
-    """Convert a numeric series to 0-100 percentile scores where low is good."""
+    """Convert a numeric series to 0-100 percentile scores where low is good.
+
+    This is used for risk and discipline metrics such as cards, fouls,
+    miscontrols, dispossessions, and turnover rates.
+    """
 
     return 100 - percentile_normalize(series) + (100 / max(len(series), 1))
 
@@ -47,9 +58,7 @@ def add_age_availability_scores(df: pd.DataFrame) -> pd.DataFrame:
     age = pd.to_numeric(out["age"], errors="coerce")
 
     age_score = np.where(
-        age.between(21, 27, inclusive="both"),
-        100,
-        np.maximum(0, 100 - np.abs(age - 24) * 12.5),
+        age.between(21, 27, inclusive="both"), 100, np.maximum(0, 100 - np.abs(age - 24) * 12.5),
     )
     out["age_score"] = age_score
     out["minutes_score"] = percentile_normalize(out["minutes"])
@@ -57,7 +66,11 @@ def add_age_availability_scores(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_possession_risk_rates(df: pd.DataFrame) -> pd.DataFrame:
-    """Engineer touch-adjusted security metrics."""
+    """Engineer touch-adjusted possession security metrics.
+
+    Raw turnovers can punish players who are simply more involved. Dividing
+    by touches gives a cleaner public-data proxy for security under usage.
+    """
 
     out = df.copy()
     touches = out["touches_per90"].replace(0, np.nan)
@@ -78,7 +91,11 @@ def add_inverse_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_metric_percentiles(df: pd.DataFrame, metric_columns: list[str]) -> pd.DataFrame:
-    """Append normalized percentile scores for requested metrics."""
+    """Append normalized percentile scores for requested metrics.
+
+    The function is retained for notebook exploration and auditability; the
+    production scoring path calls `_score_metric` inside `src.scoring`.
+    """
 
     out = df.copy()
     for col in metric_columns:
@@ -99,4 +116,3 @@ def prepare_metrics(df: pd.DataFrame) -> pd.DataFrame:
     out = add_inverse_metrics(out)
     out = add_age_availability_scores(out)
     return out
-

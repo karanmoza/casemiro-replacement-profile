@@ -65,10 +65,7 @@ CATEGORY_METRICS = {
         "progressive_passing_distance_per90",
         "live_ball_sca_per90",
     ],
-    "age_availability": [
-        "age_score",
-        "minutes_score",
-    ],
+    "age_availability": ["age_score", "minutes_score",],
 }
 
 RAW_COUNT_COLUMNS = [

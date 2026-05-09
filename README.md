@@ -2,11 +2,15 @@
 
 Public-data recruitment framework for identifying a modern Manchester United control midfielder. The sample target pool is framed **as of May 6, 2026**.
 
-## Problem
+## Project Question
 
 Manchester United's midfield issue is not only ball-winning. The prior memo argued that United added output when they needed control. This project extends that idea by asking:
 
 > If United need control, what kind of midfielder should they target as a modern Casemiro replacement?
+
+The United memo says United needed control. This project asks how to identify control.
+
+## Core Thesis
 
 The project is not trying to find a player who looks exactly like Casemiro statistically. The goal is to preserve his defensive floor while improving the possession-control problem around him.
 
@@ -23,11 +27,11 @@ The shortlist enforces these portfolio constraints:
 - Date of birth is stored in the data layer and age is calculated from the as-of date, rather than manually typed.
 - Published shortlist candidates must clear a light defensive-protection gate. The gate is intentionally low because the model screens for complementary control midfielders, not only defensive destroyers. The final ranking then follows the weighted Control Midfielder Score.
 
-## Data
+## Data Sources
 
 This repo is built to work with public data:
 
-- StatsBomb open data to demonstrate the event-data logic behind the role profile.
+- StatsBomb open data to demonstrate the event-data methodology behind the role profile.
 - FBref-style/public aggregate player statistics for broader candidate screening, supplemented where needed for non-Big-Five leagues such as Portugal.
 - Optional manual context fields such as age, minutes, market value, and availability notes.
 
@@ -46,6 +50,16 @@ The model creates a **Control Midfielder Score** from five categories:
 | Age / availability proxy | 5% | Does the profile fit a plausible squad-building window? |
 
 Metrics are normalized into percentile-style 0-100 scores. Lower-risk metrics such as fouls, cards, miscontrols, dispossessions, and turnover rates use inverse percentiles.
+
+## Key Implementation Choices
+
+- The project is framed as a transparent public-data recruitment screen, not a proprietary scouting model.
+- StatsBomb open data is used for event-data role design and methodology demonstration, while the player shortlist is scored from public aggregate statistics.
+- Category scores are simple averages of normalized metric inputs so that every result can be traced back to visible public fields.
+- Lower-is-better metrics use inverse percentiles rather than being dropped, because control midfielders should be rewarded for avoiding cheap turnovers and unnecessary fouls.
+- The published shortlist applies a light defensive-protection gate to remove pure control profiles with limited ball-winning evidence.
+- Age is calculated from date of birth using the project as-of date, which avoids stale manual age labels.
+- The model keeps a filtered-out watchlist so readers can audit which otherwise interesting players were removed by the defensive gate.
 
 ## Metric Examples
 
@@ -110,6 +124,13 @@ Running the pipeline creates:
 - `reports/casemiro_replacement_report.html`, the primary polished report with clean chart sections and plain-English explanations
 - `reports/casemiro_replacement_summary.pdf`, a secondary PDF export
 
+The report and charts are committed so the repo can be inspected without rerunning the pipeline:
+
+- [HTML report](reports/casemiro_replacement_report.html)
+- [Ranked shortlist chart](reports/charts/ranked_control_midfielder_score.png)
+- [Category heatmap](reports/charts/category_heatmap.png)
+- [Radar comparison](reports/charts/casemiro_candidate_radar.png)
+
 ## How To Run
 
 Create an environment, install dependencies, and run the report module from the project root:
@@ -129,11 +150,12 @@ MPLCONFIGDIR=.mplconfig python -m src.report
 
 The notebooks are organized as a portfolio workflow:
 
-1. `notebooks/01_data_collection.ipynb` - load public data and document fallback logic.
-2. `notebooks/02_metric_engineering.ipynb` - create per-90 and possession-risk metrics.
-3. `notebooks/03_scoring_model.ipynb` - calculate category and total scores.
-4. `notebooks/04_visualisations.ipynb` - generate charts.
-5. `notebooks/05_recruitment_summary.ipynb` - create the final shortlist, HTML report, and PDF export.
+1. `notebooks/01_statsbomb_event_methodology.ipynb` - demonstrate event-data logic using StatsBomb open data when available.
+2. `notebooks/01_data_collection.ipynb` - load public aggregate data and document fallback logic.
+3. `notebooks/02_metric_engineering.ipynb` - create per-90 and possession-risk metrics.
+4. `notebooks/03_scoring_model.ipynb` - calculate category and total scores.
+5. `notebooks/04_visualisations.ipynb` - generate charts.
+6. `notebooks/05_recruitment_summary.ipynb` - create the final shortlist, HTML report, and PDF export.
 
 ## Interpretation
 

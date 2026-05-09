@@ -838,7 +838,9 @@ def write_sample_dataset(path: Path = SAMPLE_FBREF_PATH) -> Path:
     return path
 
 
-def load_fbref_player_stats(path: str | Path | None = None, use_sample: bool = True) -> pd.DataFrame:
+def load_fbref_player_stats(
+    path: str | Path | None = None, use_sample: bool = True
+) -> pd.DataFrame:
     """Load aggregated player stats.
 
     Parameters
@@ -871,7 +873,15 @@ def clean_fbref_player_stats(df: pd.DataFrame) -> pd.DataFrame:
         .str.replace(" ", "_", regex=False)
     )
 
-    text_cols = {"player", "squad", "league", "availability_note", "date_of_birth", "context_source", "context_source_url"}
+    text_cols = {
+        "player",
+        "squad",
+        "league",
+        "availability_note",
+        "date_of_birth",
+        "context_source",
+        "context_source_url",
+    }
     if "is_target_candidate" not in cleaned.columns:
         cleaned["is_target_candidate"] = True
     for col in cleaned.columns:
@@ -896,7 +906,11 @@ def apply_may_2026_context(df: pd.DataFrame) -> pd.DataFrame:
 
     out = df.copy()
     for player, context in PLAYER_CONTEXT_MAY_2026.items():
-        mask = out["player"].eq(player) if "player" in out.columns else pd.Series(False, index=out.index)
+        mask = (
+            out["player"].eq(player)
+            if "player" in out.columns
+            else pd.Series(False, index=out.index)
+        )
         for column, value in context.items():
             if column not in out.columns:
                 out[column] = pd.NA
