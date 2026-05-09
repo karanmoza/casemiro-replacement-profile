@@ -1,0 +1,21 @@
+player,date_of_birth,squad,league,is_target_candidate,context_source,context_source_url,availability_note
+Casemiro,1992-02-23,Manchester United,Premier League,False,Manchester United reference profile,https://www.manutd.com/,"Current United reference profile, not a target"
+Manuel Ugarte,2001-04-11,Manchester United,Premier League,False,Manchester United confirmed signing from PSG in Aug 2024,https://www.manutd.com/en/news/detail/transfer-news-manuel-ugarte-signs-from-psg,"Current United midfielder as of May 2026, not a target"
+Carlos Baleba,2004-01-03,Brighton & Hove Albion,Premier League,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Carlos_Baleba,
+Ederson,1999-07-07,Atalanta,Serie A,True,UEFA 2025/26 profile,https://www.uefa.com/uefachampionsleague/clubs/players/250188474--ederson/,
+Morten Hjulmand,1999-06-25,Sporting CP,Primeira Liga,True,UEFA/Wikipedia profile checked May 2026,https://www.uefa.com/uefachampionsleague/clubs/players/250101557--morten-hjulmand/,
+João Gomes,2001-02-12,Wolverhampton Wanderers,Premier League,True,Public profile checked May 2026,https://www.premierleague.com/,
+Florentino Luís,1999-08-19,Burnley,Premier League,True,UEFA 2025/26 profile lists Burnley loan,https://www.uefa.com/uefachampionsleague/clubs/players/250089225--florentino/,"EPL target pool: defensive specialist, on loan from Benfica in 2025/26 public profiles"
+Youssouf Fofana,1999-01-10,AC Milan,Serie A,True,AC Milan / Transfermarkt profile checked May 2026,https://www.acmilan.com/en/news/articles/media/2024-08-17/official-statement-youssouf-fofana,
+Amadou Onana,2001-08-16,Aston Villa,Premier League,True,Aston Villa transfer from Everton in Jul 2024,https://global.espn.com/football/story/_/id/40616656/aston-villa-complete-amadou-onana-transfer-everton,
+Elliot Anderson,2002-11-06,Nottingham Forest,Premier League,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Elliot_Anderson_%28footballer%29,
+Bruno Guimarães,1997-11-16,Newcastle United,Premier League,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Bruno_Guimar%C3%A3es,
+Johnny Cardoso,2001-09-20,Atletico Madrid,La Liga,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Johnny_Cardoso,
+Adam Wharton,2004-02-06,Crystal Palace,Premier League,True,UEFA/Wikipedia profile checked May 2026,https://www.uefa.com/uefaconferenceleague/clubs/players/250178736--adam-wharton/,
+Angelo Stiller,2001-04-04,Stuttgart,Bundesliga,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Angelo_Stiller,
+Samuele Ricci,2001-08-21,AC Milan,Serie A,True,AC Milan confirmed signing from Torino in Jul 2025,https://www.acmilan.com/en/news/articles/media/2025-07-03/official-statement-samuele-ricci,
+Alan Varela,2001-07-04,Porto,Primeira Liga,True,UEFA/Wikipedia profile checked May 2026,https://www.uefa.com/uefaeuropaleague/clubs/players/250188256--alan-varela/,
+Exequiel Palacios,1998-10-05,Bayer Leverkusen,Bundesliga,True,Bundesliga/Transfermarkt profile checked May 2026,https://www.bundesliga.com/en/bundesliga/player/exequiel-palacios/,
+Mats Wieffer,1999-11-16,Brighton & Hove Albion,Premier League,True,Public profile checked May 2026,https://en.wikipedia.org/wiki/Mats_Wieffer,
+Hugo Larsson,2004-06-27,Eintracht Frankfurt,Bundesliga,True,Eintracht/UEFA profile checked May 2026,https://en.eintracht.de/2024-2025/squad/hugo-larsson/,
+Aleix Garcia,1997-06-28,Bayer Leverkusen,Bundesliga,True,Bundesliga confirmed Leverkusen signing in Jun 2024,https://www.bundesliga.com/en/bundesliga/news/bayer-leverkusen-sign-aleix-garcia-from-girona-27812,

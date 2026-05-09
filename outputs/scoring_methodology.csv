@@ -1,0 +1,29 @@
+category,category_weight,metric,direction_after_engineering,category_score_method
+Defensive protection,0.3,tackles_interceptions_per90,higher is better,mean of metric percentile-style scores
+Defensive protection,0.3,dribblers_tackled_pct,higher is better,mean of metric percentile-style scores
+Defensive protection,0.3,interceptions_per90,higher is better,mean of metric percentile-style scores
+Defensive protection,0.3,blocks_per90,higher is better,mean of metric percentile-style scores
+Defensive protection,0.3,aerial_win_pct,higher is better,mean of metric percentile-style scores
+Defensive protection,0.3,def_mid_third_actions_per90,higher is better,mean of metric percentile-style scores
+Transition control,0.25,ball_recoveries_per90,higher is better,mean of metric percentile-style scores
+Transition control,0.25,pressure_regains_per90,higher is better,mean of metric percentile-style scores
+Transition control,0.25,fouls_committed_per90_inv,lower is better,mean of metric percentile-style scores
+Transition control,0.25,cards_per90_inv,lower is better,mean of metric percentile-style scores
+Transition control,0.25,miscontrols_per90_inv,lower is better,mean of metric percentile-style scores
+Transition control,0.25,dispossessed_per90_inv,lower is better,mean of metric percentile-style scores
+Transition control,0.25,defensive_actions_after_loss_per90,higher is better,mean of metric percentile-style scores
+Possession security,0.25,pass_completion_pct,higher is better,mean of metric percentile-style scores
+Possession security,0.25,short_medium_pass_completion_pct,higher is better,mean of metric percentile-style scores
+Possession security,0.25,passes_received_per90,higher is better,mean of metric percentile-style scores
+Possession security,0.25,touches_per90,higher is better,mean of metric percentile-style scores
+Possession security,0.25,dispossessed_per_touch_inv,lower is better,mean of metric percentile-style scores
+Possession security,0.25,miscontrols_per_touch_inv,lower is better,mean of metric percentile-style scores
+Possession security,0.25,turnover_rate_inv,lower is better,mean of metric percentile-style scores
+Progressive value,0.15,progressive_passes_per90,higher is better,mean of metric percentile-style scores
+Progressive value,0.15,progressive_carries_per90,higher is better,mean of metric percentile-style scores
+Progressive value,0.15,passes_into_final_third_per90,higher is better,mean of metric percentile-style scores
+Progressive value,0.15,carries_into_final_third_per90,higher is better,mean of metric percentile-style scores
+Progressive value,0.15,progressive_passing_distance_per90,higher is better,mean of metric percentile-style scores
+Progressive value,0.15,live_ball_sca_per90,higher is better,mean of metric percentile-style scores
+Age / availability,0.05,age_score,higher is better,mean of metric percentile-style scores
+Age / availability,0.05,minutes_score,higher is better,mean of metric percentile-style scores
