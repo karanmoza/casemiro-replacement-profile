@@ -68,6 +68,16 @@
     li { margin-bottom: 8px; }
     footer { padding: 24px 7vw 42px; color: var(--muted); font-size: 13px; }
     @media (max-width: 900px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+    @page { size: A4; margin: 0; }
+    @media print {
+      body {
+        background: var(--bg);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      section { break-inside: avoid; }
+      img.chart { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>

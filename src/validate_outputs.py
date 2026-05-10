@@ -29,6 +29,7 @@ REQUIRED_OUTPUTS = [
     OUTPUT_DIR / "sensitivity_analysis.csv",
     REPORT_DIR / "casemiro_replacement_report.html",
     REPORT_DIR / "casemiro_replacement_report.pdf",
+    REPORT_DIR / "casemiro_replacement_summary.pdf",
 ]
 
 REQUIRED_CHARTS = [

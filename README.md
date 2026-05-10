@@ -223,6 +223,12 @@ python -m src.report
 python -m src.validate_outputs
 ```
 
+PDF generation uses the same HTML report as the source of truth and renders it through headless Chrome/Chromium. If Chrome is not installed in a standard location, set:
+
+```bash
+export CHROME_PATH="/path/to/chrome-or-chromium"
+```
+
 If Matplotlib cannot write to its default cache directory:
 
 ```bash
