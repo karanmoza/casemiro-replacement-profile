@@ -94,6 +94,7 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
         "filtered_out_watchlist": OUTPUT_DIR / "filtered_out_watchlist.csv",
         "player_score_explanation": OUTPUT_DIR / "player_score_explanation.csv",
         "metric_dictionary": OUTPUT_DIR / "metric_dictionary.csv",
+        "substack_methodology_table": OUTPUT_DIR / "substack_methodology_table.csv",
         "sensitivity_analysis": OUTPUT_DIR / "sensitivity_analysis.csv",
         "player_context_sources": OUTPUT_DIR / "player_context_sources.csv",
         "scoring_methodology": OUTPUT_DIR / "scoring_methodology.csv",
@@ -108,6 +109,9 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
     watchlist.to_csv(paths["filtered_out_watchlist"], index=False)
     score_explanation.to_csv(paths["player_score_explanation"], index=False)
     metric_dictionary.to_csv(paths["metric_dictionary"], index=False)
+    _make_substack_methodology_table(metric_dictionary).to_csv(
+        paths["substack_methodology_table"], index=False
+    )
     sensitivity.to_csv(paths["sensitivity_analysis"], index=False)
     _make_context_sources().to_csv(paths["player_context_sources"], index=False)
     _make_scoring_methodology_table(metric_dictionary).to_csv(
@@ -218,6 +222,35 @@ def _make_scoring_methodology_table(metric_dictionary: pd.DataFrame) -> pd.DataF
                 "weight": weight,
                 "input_metrics": ", ".join(metrics),
                 "score_calculation": "Average of available input-metric percentile scores",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def _make_substack_methodology_table(metric_dictionary: pd.DataFrame) -> pd.DataFrame:
+    """Create a short article-friendly methodology table."""
+
+    football_questions = {
+        "defensive_protection": "Can the player protect central spaces and preserve enough defensive floor?",
+        "transition_control": "Can the player reduce chaotic moments after possession breaks?",
+        "possession_security": "Can the player receive, circulate, and avoid cheap midfield turnovers?",
+        "progressive_value": "Can the player move the ball forward without becoming a high-risk creator search?",
+        "age_availability": "Does the player fit a plausible squad-building and signal-reliability window?",
+    }
+    rows = []
+    for category in CATEGORY_WEIGHTS:
+        metrics = metric_dictionary.loc[
+            metric_dictionary["category"].eq(category), "input_metric"
+        ].tolist()
+        examples = [
+            metric.replace("_per90", " per 90").replace("_pct", " %").replace("_", " ")
+            for metric in metrics[:4]
+        ]
+        rows.append(
+            {
+                "Category": CATEGORY_LABELS[category],
+                "Football question": football_questions[category],
+                "Example inputs": ", ".join(examples),
             }
         )
     return pd.DataFrame(rows)

@@ -158,7 +158,7 @@ The final score uses all five categories, but the diagnostic charts intentionall
 
 ## Substack Adaptation Note
 
-The full HTML/PDF/GitHub report keeps the complete input-metric dictionary for auditability. For a Substack article, use a shorter methodology table with only `Category`, `Football question`, and `Example inputs`, then link back to the GitHub report for the full metric dictionary.
+The full HTML/PDF/GitHub report keeps the complete input-metric dictionary for auditability. For a Substack article, use the shorter `outputs/substack_methodology_table.csv` with only `Category`, `Football question`, and `Example inputs`, then link back to the GitHub report for the full metric dictionary.
 
 ## Outputs
 
@@ -177,6 +177,7 @@ Tables:
 - `outputs/category_scores.csv`
 - `outputs/player_score_explanation.csv`
 - `outputs/metric_dictionary.csv`
+- `outputs/substack_methodology_table.csv`
 - `outputs/sensitivity_analysis.csv`
 
 Charts:

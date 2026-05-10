@@ -285,6 +285,8 @@ def assign_archetype(row: pd.Series) -> str:
     progression = row["progressive_value"]
     gate_margin = row.get("gate_margin", defence - MIN_DEFENSIVE_PROTECTION_SCORE)
 
+    if defence < MIN_DEFENSIVE_PROTECTION_SCORE and gate_margin >= -5:
+        return "Borderline below gate"
     if defence < MIN_DEFENSIVE_PROTECTION_SCORE:
         return "Removed by defensive gate"
     if security >= 65 and defence >= 65:

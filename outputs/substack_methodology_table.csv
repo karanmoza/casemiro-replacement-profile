@@ -1,0 +1,6 @@
+Category,Football question,Example inputs
+Defensive protection,Can the player protect central spaces and preserve enough defensive floor?,"tackles interceptions per 90, interceptions per 90, dribblers tackled %, blocks per 90"
+Transition control,Can the player reduce chaotic moments after possession breaks?,"ball recoveries per 90, pressure regains per 90, def actions after loss per 90, fouls committed per 90"
+Possession security,"Can the player receive, circulate, and avoid cheap midfield turnovers?","pass completion %, short medium pass completion %, passes received per 90, touches per 90"
+Progressive value,Can the player move the ball forward without becoming a high-risk creator search?,"progressive passes per 90, progressive carries per 90, passes into final third per 90, carries into final third per 90"
+Age / availability,Does the player fit a plausible squad-building and signal-reliability window?,"age score, minutes score"

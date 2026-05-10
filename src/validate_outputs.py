@@ -25,6 +25,7 @@ REQUIRED_OUTPUTS = [
     OUTPUT_DIR / "category_scores.csv",
     OUTPUT_DIR / "player_score_explanation.csv",
     OUTPUT_DIR / "metric_dictionary.csv",
+    OUTPUT_DIR / "substack_methodology_table.csv",
     OUTPUT_DIR / "sensitivity_analysis.csv",
     REPORT_DIR / "casemiro_replacement_report.html",
     REPORT_DIR / "casemiro_replacement_report.pdf",
