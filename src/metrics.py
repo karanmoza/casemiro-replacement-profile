@@ -27,6 +27,25 @@ def calculate_per90(
     return out
 
 
+def add_canonical_metric_aliases(df: pd.DataFrame) -> pd.DataFrame:
+    """Add canonical names used in the explainability config.
+
+    The underlying sample dataset predates the expanded methodology copy, so a
+    few fields use shorter names. These aliases keep the model vocabulary
+    readable without changing the raw data.
+    """
+
+    out = df.copy()
+    if "aerial_win_pct" in out.columns and "aerial_duel_win_pct" not in out.columns:
+        out["aerial_duel_win_pct"] = out["aerial_win_pct"]
+    if (
+        "defensive_actions_after_loss_per90" in out.columns
+        and "def_actions_after_loss_per90" not in out.columns
+    ):
+        out["def_actions_after_loss_per90"] = out["defensive_actions_after_loss_per90"]
+    return out
+
+
 def percentile_normalize(series: pd.Series) -> pd.Series:
     """Convert a numeric series to 0-100 percentile scores where high is good.
 
@@ -115,4 +134,5 @@ def prepare_metrics(df: pd.DataFrame) -> pd.DataFrame:
     out = add_possession_risk_rates(out)
     out = add_inverse_metrics(out)
     out = add_age_availability_scores(out)
+    out = add_canonical_metric_aliases(out)
     return out

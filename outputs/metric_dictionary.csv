@@ -1,0 +1,29 @@
+category,input_metric,raw_column_used,transformation,higher_is_better,explanation,caveat
+defensive_protection,tackles_interceptions_per90,tackles_interceptions_per90,Percentile score,True,Captures ball-winning activity and defensive involvement.,Activity volume is role- and team-state dependent.
+defensive_protection,interceptions_per90,interceptions_per90,Percentile score,True,Captures anticipation and ability to cut passing lanes.,Can be inflated by teams defending deeper or without the ball.
+defensive_protection,dribblers_tackled_pct,dribblers_tackled_pct,Percentile score,True,Captures one-v-one defensive reliability.,Does not show how often a player is isolated.
+defensive_protection,blocks_per90,blocks_per90,Percentile score,True,Captures defensive presence in lanes and around the box.,Blocks can reflect exposure as much as quality.
+defensive_protection,aerial_duel_win_pct,aerial_duel_win_pct,Percentile score,True,Captures physical defensive floor.,Aerial volume and opponent targeting are not captured here.
+defensive_protection,def_mid_third_actions_per90,def_mid_third_actions_per90,Percentile score,True,Captures activity in zones relevant to a deeper midfielder.,Zone definitions vary across public providers.
+transition_control,ball_recoveries_per90,ball_recoveries_per90,Percentile score,True,Captures ability to regain loose balls and stabilize broken play.,Recoveries are partly created by team pressing structure.
+transition_control,pressure_regains_per90,pressure_regains_per90,Percentile score,True,Captures whether the player helps stop counters early.,Public aggregate sources do not define pressure regains identically.
+transition_control,def_actions_after_loss_per90,def_actions_after_loss_per90,Percentile score,True,Captures reaction immediately after possession changes.,Best treated as a proxy without full event-sequence context.
+transition_control,fouls_committed_per90,fouls_committed_per90,Inverse percentile score,False,Lower is better; repeated fouling can indicate late control or transition stress.,Some tactical fouling is deliberate and context dependent.
+transition_control,cards_per90,cards_per90,Inverse percentile score,False,Lower is better; discipline matters for a deeper midfielder.,Refereeing and league context affect card rates.
+transition_control,miscontrols_per90,miscontrols_per90,Inverse percentile score,False,Lower is better; poor control can trigger transitions.,Miscontrol definitions vary by provider.
+transition_control,dispossessed_per90,dispossessed_per90,Inverse percentile score,False,Lower is better; being dispossessed in midfield creates defensive exposure.,High-touch players face more opportunities to be dispossessed.
+possession_security,pass_completion_pct,pass_completion_pct,Percentile score,True,Captures basic reliability in possession.,Completion rate does not separate easy passes from pressured passes.
+possession_security,short_medium_pass_completion_pct,short_medium_pass_completion_pct,Percentile score,True,Captures security in circulation phases.,Can be boosted by low-risk team structures.
+possession_security,passes_received_per90,passes_received_per90,Percentile score,True,Captures availability to receive and connect play.,Team possession share affects receiving volume.
+possession_security,touches_per90,touches_per90,Percentile score,True,Captures involvement and ability to stay connected to possession.,Volume should be paired with turnover safety.
+possession_security,dispossessed_per_touch,dispossessed_per_touch,Inverse percentile score,False,Lower is better; captures ball security relative to involvement.,Does not identify pitch location of dispossessions.
+possession_security,miscontrols_per_touch,miscontrols_per_touch,Inverse percentile score,False,Lower is better; captures technical security under involvement.,Does not distinguish pressure level.
+possession_security,turnover_rate,turnover_rate,Inverse percentile score,False,Lower is better; central midfield turnovers create transition risk.,Combines multiple public turnover proxies.
+progressive_value,progressive_passes_per90,progressive_passes_per90,Percentile score,True,Captures forward passing value.,Progressive pass definitions vary by source.
+progressive_value,progressive_carries_per90,progressive_carries_per90,Percentile score,True,Captures ability to move possession forward by carrying.,Carrying volume depends on role and team spacing.
+progressive_value,passes_into_final_third_per90,passes_into_final_third_per90,Percentile score,True,Captures territory-gaining passing.,Final-third entries do not measure pass difficulty.
+progressive_value,carries_into_final_third_per90,carries_into_final_third_per90,Percentile score,True,Captures territory-gaining carrying.,May favor players in more open transition systems.
+progressive_value,progressive_passing_distance_per90,progressive_passing_distance_per90,Percentile score,True,Captures volume and distance of forward passing.,Long-distance progression is not always better than secure circulation.
+progressive_value,live_ball_sca_per90,live_ball_sca_per90,Percentile score,True,Low-weight proxy for useful possession contribution near chance creation.,This is not a creator search; it is only a supporting signal.
+age_availability,age_score,age_score,Percentile score,True,Rewards players in a more useful squad-building age band.,"Age is a proxy, not a medical or development projection."
+age_availability,minutes_score,minutes_score,Percentile score,True,Rewards players with enough recent minutes to make the signal more reliable.,Minutes do not replace injury-history or medical review.

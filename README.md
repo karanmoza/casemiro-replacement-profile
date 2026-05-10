@@ -1,183 +1,217 @@
 # Casemiro Replacement Profile
 
-Public-data recruitment framework for identifying a modern Manchester United control midfielder. The sample target pool is framed **as of May 6, 2026**.
+Public-data recruitment framework for identifying a modern Casemiro replacement profile for Manchester United.
 
 ## Project Question
 
-Manchester United's midfield issue is not only ball-winning. The prior memo argued that United added output when they needed control. This project extends that idea by asking:
-
-> If United need control, what kind of midfielder should they target as a modern Casemiro replacement?
-
-The United memo says United needed control. This project asks how to identify control.
+> If Manchester United need more control, what kind of midfielder should they target as a modern Casemiro replacement?
 
 ## Core Thesis
 
-The project is not trying to find a player who looks exactly like Casemiro statistically. The goal is to preserve his defensive floor while improving the possession-control problem around him.
+The goal is not to find a player who looks exactly like Casemiro statistically. The goal is to find a midfielder who preserves enough defensive protection while improving United's possession-control problem.
 
-**Core line:** The next signing should not only win duels. It should prevent some of them from happening.
+**The next signing should not only win duels. It should prevent some of them from happening.**
 
-## May 2026 Scope
+The United memo says United needed control. This project asks how to identify control.
 
-The shortlist enforces these portfolio constraints:
+## What This Is
 
-- Candidate leagues: Premier League, La Liga, Primeira Liga, Bundesliga, Ligue 1, and Serie A.
-- Current Manchester United midfielders are treated as reference profiles, not targets.
-- Midfielders from Arsenal, Chelsea, Liverpool, and Manchester City are excluded from the target pool.
-- Manuel Ugarte is included only as a current United reference profile.
-- Date of birth is stored in the data layer and age is calculated from the as-of date, rather than manually typed.
-- Published shortlist candidates must clear a light defensive-protection gate. The gate is intentionally low because the model screens for complementary control midfielders, not only defensive destroyers. The final ranking then follows the weighted Control Midfielder Score.
+A public-data recruitment screen that converts a tactical problem into a transparent player-scoring framework. It is designed to focus scouting and video discussion.
 
-## Data Sources
+## What This Is Not
 
-This repo is built to work with public data:
+- Not proprietary scouting data.
+- Not a final signing recommendation.
+- Not a substitute for video, medical, contract, fee, or tactical role analysis.
 
-- StatsBomb open data to demonstrate the event-data methodology behind the role profile.
-- FBref-style/public aggregate player statistics for broader candidate screening, supplemented where needed for non-Big-Five leagues such as Portugal.
-- Optional manual context fields such as age, minutes, market value, and availability notes.
+## Data
 
-The project includes a sample FBref-style fallback dataset in `data/raw/sample_fbref_player_stats.csv`, generated automatically by the loader. This keeps the project runnable offline and suitable for portfolio review. Replace that CSV with current exported public data to refresh the analysis.
+The project uses public-data inputs:
+
+- FBref-style/public aggregate player statistics for broader player screening.
+- StatsBomb open-data concepts for event-data role design and methodology.
+- Manual public context fields where needed, such as age, minutes, market value, and availability notes.
+- A fallback sample dataset in `data/raw/sample_fbref_player_stats.csv` so the project can run offline.
+
+Caveats: StatsBomb open data is limited to selected competitions, public aggregate stats are not equivalent to club scouting data, and public statsbombpy access should not be treated as full 360 data access.
 
 ## Methodology
 
-The model creates a **Control Midfielder Score** from five categories:
+1. Build a public player pool across the selected leagues.
+2. Filter to midfield profiles and practical target constraints.
+3. Calculate per-90, rate, and per-touch metrics.
+4. Convert input metrics to 0-100 percentile-style scores within the screened pool.
+5. Invert negative metrics such as fouls, cards, miscontrols, dispossessions, and turnover rate.
+6. Average input metric scores into five category scores.
+7. Weight category scores into the final Control Midfielder Score.
+8. Apply a light defensive gate to create the published shortlist.
+9. Run sensitivity analysis across reasonable alternative weighting schemes.
+10. Produce a shortlist, watchlist, metric dictionary, player explanation table, charts, HTML report, and PDF report.
 
-| Category | Weight | Interpretation |
-| --- | ---: | --- |
-| Defensive protection | 30% | Can the player protect central spaces and retain a high defensive floor? |
-| Transition control | 25% | Can the player stop attacks from becoming emergency defending? |
-| Possession security | 25% | Can the player receive, circulate, and avoid cheap turnovers? |
-| Progressive value | 15% | Can the player move the ball forward without turning into a high-risk creator? |
-| Age / availability proxy | 5% | Does the profile fit a plausible squad-building window? |
+Each input metric is first converted into a comparable rate, percentage, or per-touch measure. It is then normalized into a 0-100 percentile-style score within the screened player pool. For negative events such as fouls, cards, miscontrols, dispossessions, and turnover rate, the score is inverted so that safer players receive higher values. Category scores are calculated as the average of available input-metric scores. The final Control Midfielder Score is a weighted average of the five category scores.
 
-Metrics are normalized into percentile-style 0-100 scores. Lower-risk metrics such as fouls, cards, miscontrols, dispossessions, and turnover rates use inverse percentiles.
+## Category Scores
 
-## Key Implementation Choices
+### Defensive Protection
 
-- The project is framed as a transparent public-data recruitment screen, not a proprietary scouting model.
-- StatsBomb open data is used for event-data role design and methodology demonstration, while the player shortlist is scored from public aggregate statistics.
-- Category scores are simple averages of normalized metric inputs so that every result can be traced back to visible public fields.
-- Lower-is-better metrics use inverse percentiles rather than being dropped, because control midfielders should be rewarded for avoiding cheap turnovers and unnecessary fouls.
-- The published shortlist applies a light defensive-protection gate to remove pure control profiles with limited ball-winning evidence.
-- Age is calculated from date of birth using the project as-of date, which avoids stale manual age labels.
-- The model keeps a filtered-out watchlist so readers can audit which otherwise interesting players were removed by the defensive gate.
+Football question: can the player protect the back line, defend central spaces, and retain enough of Casemiro's defensive floor?
 
-## Metric Examples
+Input metrics: tackles + interceptions per 90, interceptions per 90, dribblers tackled %, blocks per 90, aerial duel win %, defensive/middle-third actions per 90.
 
-**Defensive protection**
+Transformation: higher values receive higher percentile scores.
 
-- Tackles plus interceptions per 90
-- Dribblers tackled percentage
-- Interceptions per 90
-- Blocks per 90
-- Aerial duel win percentage
-- Defensive and middle-third defensive actions where available
+Caveat: defensive volume is affected by team style, possession share, and tactical role.
 
-**Transition control**
+### Transition Control
 
-- Ball recoveries per 90
-- Pressure regains or counterpressure regains where available
-- Fouls committed, inverse percentile
-- Cards, inverse percentile
-- Miscontrols and dispossessions, inverse percentile
-- Defensive actions after possession loss where available
+Football question: can the player stop broken-play moments from becoming emergency defending?
 
-**Possession security**
+Input metrics: ball recoveries per 90, pressure/counterpressure regains per 90, defensive actions after loss, fouls committed per 90, cards per 90, miscontrols per 90, dispossessed per 90.
 
-- Pass completion percentage
-- Short and medium pass completion percentage
-- Passes received per 90
-- Touches per 90
-- Dispossessed per touch, inverse percentile
-- Miscontrols per touch, inverse percentile
-- Turnover rate, inverse percentile
+Transformation: regain/activity metrics use normal percentiles; fouls, cards, miscontrols, and dispossessions use inverse percentiles.
 
-**Progressive value**
+Caveat: public aggregate data cannot fully capture pressing triggers or exact event sequence context.
 
-- Progressive passes per 90
-- Progressive carries per 90
-- Passes into final third per 90
-- Carries into final third per 90
-- Progressive passing distance
-- Live-ball shot-creating actions, low weight
+### Possession Security
 
-**Age / availability**
+Football question: can the player receive, circulate, and avoid cheap turnovers under volume?
 
-- Age score, with the ideal public-screening range around 21-27
-- Minutes played score
-- Optional market value and availability notes for interpretation
+Input metrics: pass completion %, short/medium pass completion %, passes received per 90, touches per 90, dispossessed per touch, miscontrols per touch, turnover rate.
+
+Transformation: positive involvement/security metrics use normal percentiles; per-touch turnover risk uses inverse percentiles.
+
+Caveat: public data does not fully show pressure level, pass difficulty, or pitch location.
+
+### Progressive Value
+
+Football question: can the player move the ball forward without turning the role into a high-risk creator search?
+
+Input metrics: progressive passes per 90, progressive carries per 90, passes into final third per 90, carries into final third per 90, progressive passing distance per 90, live-ball shot-creating actions per 90.
+
+Transformation: higher values receive higher percentile scores.
+
+Caveat: progression type matters. Passing progressors and carrying progressors solve different tactical problems.
+
+### Age / Availability
+
+Football question: does the player fit a plausible squad-building and signal-reliability window?
+
+Input metrics: age score and minutes played score.
+
+Transformation: age is scored around a useful squad-building band; minutes use percentile scoring.
+
+Caveat: this is only a public proxy. Medical history, workload, contract status, fee, and player availability need separate work.
+
+## Weighting Rationale
+
+The weighting scheme reflects Manchester United's specific midfield-control problem.
+
+This is not a search for the best pure ball-winner. It is a search for a midfielder who can preserve enough defensive protection while improving control.
+
+- Defensive protection receives 30%, the highest single weight, because any Casemiro replacement profile must still protect the back line, defend central spaces, and survive defensive responsibility.
+- Transition control receives 25% because United's issue is not only settled defending; it is also the number of chaotic moments created after possession breaks.
+- Possession security receives 25% because the deeper thesis is that United need control. A midfielder who loses possession too often will recreate the same emergency-defending problem even if he wins duels.
+- Progressive value receives 15% because United still need the player to move the ball forward, but this role should not become a pure creator search.
+- Age / availability receives 5% because practical squad-building context matters, but it should not overpower the football profile.
+
+The weighting scheme is designed to reward midfielders who can defend first, stabilize transitions second, secure possession third, and progress the ball without turning the role into a high-risk creator profile.
+
+These weights are subjective but transparent. That is why the report includes sensitivity analysis to test whether the shortlist collapses when reasonable weighting assumptions change.
+
+## Defensive Gate
+
+A weight ranks players. A gate enforces a minimum requirement.
+
+Even though defensive protection has the highest single weight, a player can still score highly overall if he is elite in possession security and progression. For a Casemiro replacement profile, that creates a risk: the model could surface elegant possession players who do not have enough defensive evidence to survive United's midfield environment.
+
+The defensive gate is therefore a light screening threshold. It is not a scouting verdict. It removes profiles with limited defensive evidence from the published shortlist, while keeping interesting names on the watchlist for video review.
+
+**The defensive gate should be read as a minimum-evidence filter, not as a final judgment on defensive ability.**
+
+Palacios clears the defensive gate narrowly, so he should not be treated as a pure defensive replacement. Elliot Anderson falls just below the gate, so he should remain a watchlist player rather than be treated as definitively rejected. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.
+
+This is why the report separates the published shortlist from the watchlist rather than deleting below-gate players entirely.
+
+## Sensitivity Analysis
+
+Sensitivity analysis tests whether the shortlist depends too heavily on one subjective weighting choice. A robust candidate remains near the top under several reasonable versions of the model. A fragile candidate ranks highly only when the model favors one specific trait.
+
+Scenarios:
+
+- Base case: defensive 30, transition 25, possession 25, progressive 15, age 5
+- Defensive-heavy: defensive 40, transition 25, possession 20, progressive 10, age 5
+- Possession-heavy: defensive 25, transition 20, possession 35, progressive 15, age 5
+- Transition-heavy: defensive 25, transition 35, possession 20, progressive 15, age 5
+- Progression-heavy: defensive 25, transition 20, possession 20, progressive 30, age 5
+- Equal-weight football profile: defensive 25, transition 25, possession 25, progressive 20, age 5
+
+Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.
+
+## Diagnostic Charts
+
+The final score uses all five categories, but the diagnostic charts intentionally use smaller subsets of input metrics. This avoids every plot telling the same story and helps identify why a player scores well: defensive activity, possession security, transition safety, or progression type.
 
 ## Outputs
 
-Running the pipeline creates:
+Reports:
+
+- `reports/casemiro_replacement_report.html`
+- `reports/casemiro_replacement_report.pdf`
+- `reports/casemiro_replacement_summary.pdf`
+
+Tables:
 
 - `outputs/candidate_shortlist.csv`
+- `outputs/watchlist_removed_by_gate.csv`
 - `outputs/category_scores.csv`
+- `outputs/player_score_explanation.csv`
+- `outputs/metric_dictionary.csv`
 - `outputs/sensitivity_analysis.csv`
-- `outputs/player_context_sources.csv`
-- `outputs/filtered_out_watchlist.csv`, showing otherwise eligible players removed by the defensive-protection gate
-- `outputs/scoring_methodology.csv`, listing category weights, metric inputs, and scoring direction
+
+Charts:
+
 - `reports/charts/ranked_control_midfielder_score.png`
+- `reports/charts/security_vs_defensive_floor.png`
 - `reports/charts/category_heatmap.png`
 - `reports/charts/casemiro_candidate_radar.png`
-- `reports/charts/security_vs_defensive_floor.png`
-- `reports/charts/sensitivity_analysis.png`
-- `reports/casemiro_replacement_report.html`, the primary polished report with clean chart sections and plain-English explanations
-- `reports/casemiro_replacement_summary.pdf`, a secondary PDF export
+- `reports/charts/defensive_gate_diagnostic.png`
+- `reports/charts/possession_security_breakdown.png`
+- `reports/charts/transition_chaos_map.png`
+- `reports/charts/progression_type_chart.png`
+- `reports/charts/sensitivity_rank_stability.png`
+- `reports/charts/archetype_summary.png`
 
-The report and charts are committed so the repo can be inspected without rerunning the pipeline:
+## Key Interpretation
 
-- [HTML report](reports/casemiro_replacement_report.html)
-- [Ranked shortlist chart](reports/charts/ranked_control_midfielder_score.png)
-- [Category heatmap](reports/charts/category_heatmap.png)
-- [Radar comparison](reports/charts/casemiro_candidate_radar.png)
+Palacios leads the screen as a possession-control candidate, not as a like-for-like Casemiro replacement. Cardoso is the cleaner two-axis defensive/security fit. Borderline and watchlist players should be reviewed through video and tactical role context.
+
+## Limitations
+
+- Public data cannot replace club scouting.
+- Aggregate stats lose role, team, pressure, and pitch-location context.
+- StatsBomb open data is limited to selected competitions.
+- Public statsbombpy access should not be treated as full 360 data access.
+- League strength and team style affect metrics.
+- Injury history and transfer feasibility require separate work.
+- The defensive gate is a screen, not a verdict.
 
 ## How To Run
 
-Create an environment, install dependencies, and run the report module from the project root:
+From the project root:
 
 ```bash
 pip install -r requirements.txt
 python -m src.report
+python -m src.validate_outputs
 ```
 
-If Matplotlib cannot write to its default cache directory, set a local cache:
+If Matplotlib cannot write to its default cache directory:
 
 ```bash
 MPLCONFIGDIR=.mplconfig python -m src.report
+python -m src.validate_outputs
 ```
-
-## Notebook Flow
-
-The notebooks are organized as a portfolio workflow:
-
-1. `notebooks/01_statsbomb_event_methodology.ipynb` - demonstrate event-data logic using StatsBomb open data when available.
-2. `notebooks/01_data_collection.ipynb` - load public aggregate data and document fallback logic.
-3. `notebooks/02_metric_engineering.ipynb` - create per-90 and possession-risk metrics.
-4. `notebooks/03_scoring_model.ipynb` - calculate category and total scores.
-5. `notebooks/04_visualisations.ipynb` - generate charts.
-6. `notebooks/05_recruitment_summary.ipynb` - create the final shortlist, HTML report, and PDF export.
-
-## Interpretation
-
-A high score does not mean "sign this player." It means the player is worth deeper review under a control-midfielder brief, inside the May 2026 target-pool constraints. The best candidates should combine:
-
-- Enough defensive output to keep Casemiro's floor.
-- Better security and receiving volume to stabilize possession.
-- Transition behavior that prevents duels from occurring in dangerous spaces.
-- Enough progression to help United move up the pitch without forcing every attack.
-
-In the generated sample, Exequiel Palacios leads the public-data screen as a possession-control profile, not as a pure Casemiro defensive replacement. He clears the light defensive gate but remains below Casemiro's defensive reference band, so any recommendation would require video confirmation that his coverage translates to United's transition-heavy environment, plus availability and injury-history review. Manuel Ugarte is retained as an internal reference: his defensive protection and basic security are useful, but his low progressive-value score points to why United may still need a complementary midfielder.
-
-## Limitations
-
-- StatsBomb open data is limited to selected competitions and does not cover every current recruitment target.
-- Public statsbombpy access should not be treated as access to proprietary 360 metrics.
-- FBref/public data is aggregated and not equivalent to club scouting data.
-- Public definitions vary by provider and may not match internal event tagging.
-- League strength, tactical role, team possession share, and pressing systems affect these metrics.
-- Market value is treated only as context, not a definitive availability measure.
-- This is a screening framework, not a final recruitment decision model.
 
 ## Suggested Resume Bullet
 
-Built a Python public-data recruitment framework for Manchester United midfield succession planning, combining FBref-style/public aggregate metrics, StatsBomb open-data concepts for event-data role design, percentile normalization, weighted scoring, sensitivity analysis, BCG-style visual exhibits, and an HTML analytical report.
+Built a Python public-data recruitment framework for Manchester United midfield succession planning, combining public aggregate metrics, StatsBomb open-data concepts for event-data role design, percentile normalization, defensive-gate screening, sensitivity analysis, diagnostic visualizations, and HTML/PDF analytical reporting.

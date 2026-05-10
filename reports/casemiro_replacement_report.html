@@ -7,14 +7,14 @@
   <style>
     :root {
       --ink: #111827;
-      --muted: #5b6472;
-      --line: #d9dee7;
+      --muted: #5b6573;
+      --line: #d9dee5;
+      --bg: #f5f1eb;
       --panel: #ffffff;
-      --bg: #f3f4f6;
-      --red: #b11226;
-      --blue: #2563eb;
-      --green: #0f766e;
-      --gold: #b7791f;
+      --red: #9f1d20;
+      --navy: #16324f;
+      --green: #2e8b57;
+      --gold: #b88a1b;
     }
     * { box-sizing: border-box; }
     body {
@@ -22,298 +22,168 @@
       background: var(--bg);
       color: var(--ink);
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      line-height: 1.45;
+      line-height: 1.48;
     }
     .hero {
-      background: #101827;
+      background: var(--navy);
       color: white;
-      border-left: 12px solid var(--red);
       padding: 44px 7vw 38px;
+      border-left: 12px solid var(--red);
     }
     .eyebrow {
       color: #cfd6e1;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: .08em;
-      font-weight: 700;
+      font-weight: 800;
     }
-    h1 {
-      margin: 10px 0 12px;
-      font-size: clamp(32px, 5vw, 58px);
-      line-height: 1.02;
-      letter-spacing: 0;
-    }
-    .hero p {
-      max-width: 980px;
-      margin: 0;
-      font-size: 18px;
-      color: #e5e7eb;
-    }
+    h1 { margin: 10px 0 12px; font-size: clamp(34px, 5vw, 58px); line-height: 1.02; }
+    .hero p { max-width: 980px; margin: 0; font-size: 18px; color: #eef2f6; }
     main { padding: 28px 7vw 64px; }
-    section {
-      margin: 26px 0;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: 0 16px 35px rgba(17, 24, 39, .06);
-    }
-    .section-head {
-      padding: 24px 26px 8px;
-      border-bottom: 1px solid #edf0f5;
-    }
-    h2 {
-      margin: 0 0 6px;
-      font-size: 26px;
-      letter-spacing: 0;
-    }
-    .section-head p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      max-width: 980px;
-    }
-    .grid-3, .grid-2 {
-      display: grid;
-      gap: 18px;
-      padding: 24px 26px;
-    }
+    section { margin: 26px 0; background: var(--panel); border: 1px solid var(--line); }
+    .section-head { padding: 24px 26px 10px; border-bottom: 1px solid #edf0f5; }
+    h2 { margin: 0 0 8px; font-size: 26px; }
+    h3 { margin: 0 0 10px; font-size: 18px; }
+    .section-head p { margin: 0 0 12px; color: var(--muted); max-width: 980px; }
+    .grid-3, .grid-2 { display: grid; gap: 18px; padding: 24px 26px; }
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .grid-2 { grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); }
-    .card {
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 18px;
-    }
-    .kpi {
-      border-left: 6px solid var(--blue);
-      min-height: 145px;
-    }
+    .grid-2 { grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); }
+    .card { border: 1px solid var(--line); padding: 18px; background: #fff; }
+    .kpi { border-left: 6px solid var(--navy); min-height: 148px; }
     .kpi.red { border-left-color: var(--red); }
     .kpi.green { border-left-color: var(--green); }
-    .label {
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-weight: 800;
-    }
-    .value {
-      margin-top: 8px;
-      font-size: 28px;
-      font-weight: 800;
-    }
-    .note {
-      color: var(--muted);
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    .callout {
-      background: #fff7ed;
-      border-left: 6px solid var(--gold);
-      padding: 18px 20px;
-      margin: 0 26px 24px;
-    }
-    .callout strong { color: #7c2d12; }
-    .chart-card {
-      padding: 16px;
-      border: 1px solid var(--line);
-      background: white;
-    }
-    img.chart {
-      width: 100%;
-      height: auto;
-      display: block;
-      background: white;
-    }
-    .explainer {
-      border-left: 5px solid var(--red);
-      background: #f9fafb;
-      padding: 18px 20px;
-    }
-    .explainer h3, .card h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
-    .explainer ul {
-      margin: 0;
-      padding-left: 18px;
-      color: #273244;
-    }
-    .explainer li { margin: 0 0 10px; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    th {
-      background: #111827;
-      color: white;
-      text-align: left;
-      padding: 10px;
-      white-space: nowrap;
-    }
-    td {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 10px;
-      vertical-align: top;
-    }
-    tr:nth-child(even) td { background: #f9fafb; }
-    .pill {
-      display: inline-block;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: #e8eefc;
-      color: #1d4ed8;
-      font-size: 12px;
-      font-weight: 700;
-      margin: 4px 6px 0 0;
-    }
-    .method {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      padding: 24px 26px;
-    }
-    .method .card {
-      border-top: 5px solid var(--blue);
-      min-height: 160px;
-    }
-    .small { font-size: 12px; color: var(--muted); }
-    footer {
-      color: var(--muted);
-      font-size: 12px;
-      padding: 0 7vw 40px;
-    }
-    @media (max-width: 980px) {
-      .grid-3, .grid-2, .method { grid-template-columns: 1fr; }
-      main { padding: 18px; }
-      .hero { padding: 34px 24px; }
-      table { font-size: 12px; }
-    }
+    .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+    .value { margin-top: 8px; font-size: 28px; font-weight: 800; }
+    .note { color: var(--muted); margin-top: 10px; font-size: 14px; }
+    .copy { padding: 24px 26px; max-width: 1120px; }
+    .copy p { margin-top: 0; }
+    .callout { margin: 0 26px 24px; padding: 18px 20px; background: #fff7ed; border-left: 6px solid var(--gold); }
+    .chart-card { padding: 16px 26px 24px; }
+    img.chart { width: 100%; max-width: 1180px; height: auto; display: block; background: white; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    .data-table th { background: var(--navy); color: white; text-align: left; padding: 9px; }
+    .data-table td { border-bottom: 1px solid var(--line); padding: 8px; vertical-align: top; overflow-wrap: anywhere; }
+    .data-table tr:nth-child(even) td { background: #f8fafc; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 8px; }
+    footer { padding: 24px 7vw 42px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <header class="hero">
-    <div class="eyebrow">Manchester United analytics portfolio | public data | May 6, 2026</div>
+    <div class="eyebrow">Manchester United public-data recruitment screen</div>
     <h1>Casemiro Replacement Profile</h1>
-    <p>The next signing should not only win duels. It should prevent some of them from happening.</p>
+    <p><strong>The next signing should not only win duels. It should prevent some of them from happening.</strong><br>
+    This is a public-data recruitment framework, not proprietary scouting data or a signing verdict.</p>
   </header>
   <main>
     <section>
       <div class="section-head">
         <h2>Executive View</h2>
-        <p>This is a recruitment screen, not a signing verdict. It translates United's need for control into a repeatable public-data framework.</p>
+        <p>Palacios is the strongest possession-control candidate in the screen, not the strongest like-for-like Casemiro replacement. Cardoso is the cleaner two-axis defensive/security fit.</p>
       </div>
       <div class="grid-3">
-        <div class="card kpi red">
-          <div class="label">Top weighted screen</div>
-          <div class="value">Exequiel Palacios</div>
-          <div class="note">Bayer Leverkusen | score 74.8 | age 27</div>
-        </div>
-        <div class="card kpi">
-          <div class="label">Published control profiles</div>
-          <div class="value">2 players</div>
-          <div class="note">Gated shortlist candidates with possession-security score of 70+. These profiles help United reduce repeat emergency defending.</div>
-        </div>
-        <div class="card kpi green">
-          <div class="label">Defensive reference</div>
-          <div class="value">4 players</div>
-          <div class="note">Priority candidates above Casemiro's defensive-protection reference score.</div>
-        </div>
+        <div class="card kpi red"><div class="label">Top weighted screen</div><div class="value">Exequiel Palacios</div><div class="note">Score 73.8. Leads through control and progression, subject to defensive translation and availability review.</div></div>
+        <div class="card kpi green"><div class="label">Two-axis fit</div><div class="value">Johnny Cardoso</div><div class="note">Defence 85.0, possession 71.4. More balanced defensive/security profile.</div></div>
+        <div class="card kpi"><div class="label">Defensive reference</div><div class="value">63.3</div><div class="note">Casemiro is a defensive responsibility reference, not the clone target.</div></div>
       </div>
-      <div class="callout"><strong>Interpretation:</strong> Palacios should be read as the strongest possession-control candidate in the screen, not as the strongest like-for-like Casemiro replacement. He leads the screen subject to availability and injury-history review. Cardoso is the cleaner two-axis defensive/security fit.</div>
-      <div style="padding: 0 26px 24px;"><table class="dataframe data-table reference-table">
+      <div class="callout"><strong>Interpretation:</strong> The model starts the scouting conversation. It does not replace video, medical review, contract work, fee analysis, or tactical role evaluation.</div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>What This Model Is — and Is Not</h2></div>
+      <div class="copy">
+        <p>This is a recruitment screen, not a signing verdict. It converts United's abstract need for midfield control into a transparent, auditable public-data framework.</p>
+        <p>It is designed to focus scouting/video discussion. It does not replace club scouting, medical review, contract work, fee analysis, or tactical video.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>How the Score Works</h2></div>
+      <div class="copy">
+        <p><strong>Formula:</strong> 30% defensive protection + 25% transition control + 25% possession security + 15% progressive value + 5% age / availability.</p>
+        <p>Each input metric is first converted into a comparable rate, percentage, or per-touch measure. It is then normalized into a 0-100 percentile-style score within the screened player pool. For negative events such as fouls, cards, miscontrols, dispossessions, and turnover rate, the score is inverted so that safer players receive higher values. Category scores are calculated as the average of available input-metric scores. The final Control Midfielder Score is a weighted average of the five category scores.</p>
+        <p>A 100 means the player is at the top of this public screened pool for that metric or category. It does not mean perfect football ability.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Why These Weights?</h2></div>
+      <div class="copy">
+        <p>The weighting scheme reflects Manchester United's specific midfield-control problem. This is not a search for the best pure ball-winner. It is a search for a midfielder who can preserve enough defensive protection while improving control.</p>
+        <ul>
+          <li><strong>Defensive protection receives 30%</strong>, the highest single weight, because any Casemiro replacement profile must still protect the back line, defend central spaces, and survive defensive responsibility.</li>
+          <li><strong>Transition control receives 25%</strong> because United's issue is not only settled defending; it is also the number of chaotic moments created after possession breaks.</li>
+          <li><strong>Possession security receives 25%</strong> because the deeper thesis is that United need control. A midfielder who loses possession too often will recreate the same emergency-defending problem even if he wins duels.</li>
+          <li><strong>Progressive value receives 15%</strong> because United still need the player to move the ball forward, but this role should not become a pure creator search.</li>
+          <li><strong>Age / availability receives 5%</strong> because practical squad-building context matters, but it should not overpower the football profile.</li>
+        </ul>
+        <p>The weighting scheme is designed to reward midfielders who can defend first, stabilize transitions second, secure possession third, and progress the ball without turning the role into a high-risk creator profile.</p>
+        <p>These weights are subjective but transparent. That is why the report includes sensitivity analysis to test whether the shortlist collapses when reasonable weighting assumptions change.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Why Use a Defensive Gate?</h2></div>
+      <div class="copy">
+        <p>A weight ranks players. A gate enforces a minimum requirement.</p>
+        <p>Even though defensive protection has the highest single weight, a player can still score highly overall if he is elite in possession security and progression. For a Casemiro replacement profile, that creates a risk: the model could surface elegant possession players who do not have enough defensive evidence to survive United's midfield environment.</p>
+        <p>The defensive gate should be read as a minimum-evidence filter, not as a final judgment on defensive ability. Palacios clears the defensive gate narrowly, so he should not be treated as a pure defensive replacement. Elliot Anderson falls just below the gate, so he should remain a watchlist player rather than be treated as definitively rejected.</p>
+        <p>This is why the report separates the published shortlist from the watchlist rather than deleting below-gate players entirely. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>From Input Metrics to Category Scores</h2></div>
+      <div class="copy"><table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
-      <th>Reference</th>
-      <th>Age</th>
-      <th>Defence</th>
-      <th>Transition</th>
-      <th>Security</th>
-      <th>Progression</th>
+      <th>Category</th>
+      <th>Input metrics</th>
+      <th>Transformation</th>
+      <th>What it means</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Manuel Ugarte</td>
-      <td>25</td>
-      <td>84.17</td>
-      <td>57.14</td>
-      <td>72.14</td>
-      <td>15.00</td>
+      <td>Age / availability</td>
+      <td>age_score, minutes_score</td>
+      <td>Percentile / inverse percentile</td>
+      <td>Rewards players in a more useful squad-building age band. Rewards players with enough recent minutes to make the signal more reliable.</td>
     </tr>
     <tr>
-      <td>Casemiro</td>
-      <td>34</td>
-      <td>63.33</td>
-      <td>12.86</td>
-      <td>15.00</td>
-      <td>25.00</td>
+      <td>Defensive protection</td>
+      <td>tackles_interceptions_per90, interceptions_per90, dribblers_tackled_pct, blocks_per90, aerial_duel_win_pct, def_mid_third_actions_per90</td>
+      <td>Percentile / inverse percentile</td>
+      <td>Captures ball-winning activity and defensive involvement. Captures anticipation and ability to cut passing lanes.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>pass_completion_pct, short_medium_pass_completion_pct, passes_received_per90, touches_per90, dispossessed_per_touch, miscontrols_per_touch, turnover_rate</td>
+      <td>Percentile / inverse percentile</td>
+      <td>Captures basic reliability in possession. Captures security in circulation phases.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>progressive_passes_per90, progressive_carries_per90, passes_into_final_third_per90, carries_into_final_third_per90, progressive_passing_distance_per90, live_ball_sca_per90</td>
+      <td>Percentile / inverse percentile</td>
+      <td>Captures forward passing value. Captures ability to move possession forward by carrying.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>ball_recoveries_per90, pressure_regains_per90, def_actions_after_loss_per90, fouls_committed_per90, cards_per90, miscontrols_per90, dispossessed_per90</td>
+      <td>Percentile / inverse percentile</td>
+      <td>Captures ability to regain loose balls and stabilize broken play. Captures whether the player helps stop counters early.</td>
     </tr>
   </tbody>
 </table></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>How The Score Works</h2>
-        <p>Each player receives five category scores. Those categories are weighted into a single Control Midfielder Score.</p>
-      </div>
-      <div class="method">
-        
-            <div class="card">
-              <div class="label">Defensive protection</div>
-              <div class="value">30%</div>
-              <div class="note">6 input metrics. Category score is the average of percentile-style metric scores.</div>
-            </div>
-            
-
-            <div class="card">
-              <div class="label">Transition control</div>
-              <div class="value">25%</div>
-              <div class="note">7 input metrics. Category score is the average of percentile-style metric scores.</div>
-            </div>
-            
-
-            <div class="card">
-              <div class="label">Possession security</div>
-              <div class="value">25%</div>
-              <div class="note">7 input metrics. Category score is the average of percentile-style metric scores.</div>
-            </div>
-            
-
-            <div class="card">
-              <div class="label">Progressive value</div>
-              <div class="value">15%</div>
-              <div class="note">6 input metrics. Category score is the average of percentile-style metric scores.</div>
-            </div>
-            
-
-            <div class="card">
-              <div class="label">Age / availability</div>
-              <div class="value">5%</div>
-              <div class="note">2 input metrics. Category score is the average of percentile-style metric scores.</div>
-            </div>
-            
-      </div>
-      <div class="callout"><strong>Plain English:</strong> A 100 does not mean world class. It means the player is high relative to this screened public-data pool. Negative events such as fouls, cards, miscontrols, dispossessions, and turnover rate are inverted so safer players score better.</div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <h2>1. Ranked Shortlist</h2>
-        <p>The published shortlist applies a light defensive-protection gate to remove pure control profiles with limited ball-winning evidence. The gate is intentionally low because the model is screening for complementary control midfielders, not only defensive destroyers.</p>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card"><img class="chart" src="charts/ranked_control_midfielder_score.png" alt="Ranked published shortlist"></div>
-        <div class="explainer">
-          <h3>How to read it</h3>
-          <ul>
-            <li>The bar length is the final weighted score, not a direct scouting grade.</li>
-            <li>Palacios rises because possession security and progression matter heavily in the brief.</li>
-            <li>Cardoso's lower total still matters because his defensive floor is much stronger.</li>
-          </ul>
-        </div>
-      </div>
-      <div style="padding: 0 26px 26px;"><table class="dataframe data-table shortlist-table">
+      <div class="section-head"><h2>Ranked Published Shortlist</h2><p>The final score uses all five categories.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/ranked_control_midfielder_score.png" alt="Ranked shortlist"></div>
+      <div class="copy"><table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
       <th>#</th>
@@ -326,7 +196,7 @@
       <th>Transition</th>
       <th>Security</th>
       <th>Progression</th>
-      <th>Age/Avail.</th>
+      <th>Gate margin</th>
     </tr>
   </thead>
   <tbody>
@@ -336,12 +206,12 @@
       <td>Bayer Leverkusen</td>
       <td>Bundesliga</td>
       <td>27</td>
-      <td>74.77</td>
+      <td>73.77</td>
       <td>47.50</td>
       <td>79.29</td>
       <td>99.29</td>
       <td>85.83</td>
-      <td>60.00</td>
+      <td>2.50</td>
     </tr>
     <tr>
       <td>2</td>
@@ -349,12 +219,12 @@
       <td>Atletico Madrid</td>
       <td>La Liga</td>
       <td>24</td>
-      <td>71.00</td>
+      <td>70.00</td>
       <td>85.00</td>
       <td>63.57</td>
       <td>71.43</td>
       <td>57.50</td>
-      <td>62.50</td>
+      <td>40.00</td>
     </tr>
     <tr>
       <td>3</td>
@@ -362,12 +232,12 @@
       <td>Sporting CP</td>
       <td>Primeira Liga</td>
       <td>26</td>
-      <td>59.82</td>
+      <td>58.82</td>
       <td>69.17</td>
       <td>51.07</td>
       <td>55.71</td>
       <td>55.00</td>
-      <td>82.50</td>
+      <td>24.17</td>
     </tr>
     <tr>
       <td>4</td>
@@ -375,12 +245,12 @@
       <td>Burnley</td>
       <td>Premier League</td>
       <td>26</td>
-      <td>59.54</td>
+      <td>58.54</td>
       <td>95.83</td>
       <td>59.29</td>
       <td>47.86</td>
       <td>8.33</td>
-      <td>55.00</td>
+      <td>50.83</td>
     </tr>
     <tr>
       <td>5</td>
@@ -388,12 +258,12 @@
       <td>Brighton &amp; Hove Albion</td>
       <td>Premier League</td>
       <td>26</td>
-      <td>57.57</td>
+      <td>56.57</td>
       <td>60.00</td>
       <td>52.86</td>
       <td>56.43</td>
       <td>55.83</td>
-      <td>77.50</td>
+      <td>15.00</td>
     </tr>
     <tr>
       <td>6</td>
@@ -401,12 +271,12 @@
       <td>Crystal Palace</td>
       <td>Premier League</td>
       <td>22</td>
-      <td>55.61</td>
+      <td>54.61</td>
       <td>50.00</td>
       <td>61.43</td>
       <td>50.00</td>
       <td>67.50</td>
-      <td>52.50</td>
+      <td>5.00</td>
     </tr>
     <tr>
       <td>7</td>
@@ -414,12 +284,12 @@
       <td>Porto</td>
       <td>Primeira Liga</td>
       <td>24</td>
-      <td>54.32</td>
+      <td>53.32</td>
       <td>57.50</td>
       <td>57.86</td>
       <td>51.43</td>
       <td>42.50</td>
-      <td>67.50</td>
+      <td>12.50</td>
     </tr>
     <tr>
       <td>8</td>
@@ -427,12 +297,12 @@
       <td>Atalanta</td>
       <td>Serie A</td>
       <td>26</td>
-      <td>50.91</td>
+      <td>49.91</td>
       <td>67.50</td>
       <td>52.86</td>
       <td>24.29</td>
       <td>45.00</td>
-      <td>92.50</td>
+      <td>22.50</td>
     </tr>
     <tr>
       <td>9</td>
@@ -440,12 +310,12 @@
       <td>Brighton &amp; Hove Albion</td>
       <td>Premier League</td>
       <td>22</td>
-      <td>47.17</td>
+      <td>46.17</td>
       <td>51.25</td>
       <td>50.71</td>
       <td>25.71</td>
       <td>55.83</td>
-      <td>86.25</td>
+      <td>6.25</td>
     </tr>
     <tr>
       <td>10</td>
@@ -453,12 +323,12 @@
       <td>Wolverhampton Wanderers</td>
       <td>Premier League</td>
       <td>25</td>
-      <td>44.55</td>
+      <td>43.55</td>
       <td>75.00</td>
       <td>44.29</td>
       <td>6.43</td>
       <td>35.83</td>
-      <td>80.00</td>
+      <td>30.00</td>
     </tr>
     <tr>
       <td>11</td>
@@ -466,186 +336,466 @@
       <td>Aston Villa</td>
       <td>Premier League</td>
       <td>24</td>
-      <td>32.32</td>
+      <td>31.32</td>
       <td>55.00</td>
       <td>25.00</td>
       <td>14.29</td>
       <td>16.67</td>
-      <td>70.00</td>
+      <td>10.00</td>
     </tr>
   </tbody>
 </table></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>2. Control Matrix</h2>
-        <p>This chart shows the main football trade-off: can the player help United control possession without losing the defensive floor?</p>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card"><img class="chart" src="charts/security_vs_defensive_floor.png" alt="Possession security versus defensive protection"></div>
-        <div class="explainer">
-          <h3>Scout and fan read</h3>
-          <ul>
-            <li>Right side means safer possession: more secure receiving, passing, and turnover profile.</li>
-            <li>Higher up means stronger defensive protection relative to the pool.</li>
-            <li>Bigger bubbles add more progressive value: they help United move forward, not just recycle.</li>
-          </ul>
-        </div>
-      </div>
+      <div class="section-head"><h2>Control Matrix</h2><p>Who adds possession security without losing the defensive floor?</p></div>
+      <div class="chart-card"><img class="chart" src="charts/security_vs_defensive_floor.png" alt="Control matrix"></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>3. Category Heatmap</h2>
-        <p>The heatmap explains why players with similar total scores can be very different midfielders.</p>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card"><img class="chart" src="charts/category_heatmap.png" alt="Category heatmap"></div>
-        <div class="explainer">
-          <h3>What the colors mean</h3>
-          <ul>
-            <li>Green means a strength relative to the screened public-data pool.</li>
-            <li>Red does not automatically rule a player out; it tells the scout what to test on video.</li>
-            <li>Florentino is a defensive specialist, while Palacios and Stiller are clearer control/pass profiles.</li>
-          </ul>
-        </div>
-      </div>
+      <div class="section-head"><h2>Defensive Gate Diagnostic</h2></div>
+      <div class="copy"><p>The gate is useful as a screen, but the Palacios-Anderson gap shows why borderline cases should not be treated as definitive scouting judgments.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/defensive_gate_diagnostic.png" alt="Defensive gate diagnostic"></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>4. Casemiro and Ugarte References</h2>
-        <p>United's current midfield references help explain the target brief: preserve the ball-winning base, but add more control and progression.</p>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card"><img class="chart" src="charts/casemiro_candidate_radar.png" alt="Radar comparison"></div>
-        <div class="explainer">
-          <h3>Why this matters</h3>
-          <ul>
-            <li>Casemiro is the ageing reference point for defensive responsibility, not the statistical clone target.</li>
-            <li>Ugarte already covers much of the defensive/security need.</li>
-            <li>The next midfielder should complement that base by adding cleaner possession and progression.</li>
-          </ul>
-        </div>
-      </div>
+      <div class="section-head"><h2>Possession Security Breakdown</h2></div>
+      <div class="copy"><p>This plot separates players who simply pass safely from players who are actively available, involved, and secure under volume.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/possession_security_breakdown.png" alt="Possession security breakdown"></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>5. Sensitivity and Practicality</h2>
-        <p>A good screen should not collapse when reasonable category weights move.</p>
-      </div>
-      <div class="grid-2">
-        <div class="chart-card"><img class="chart" src="charts/sensitivity_analysis.png" alt="Sensitivity analysis"></div>
-        <div class="explainer">
-          <h3>What to look for</h3>
-          <ul>
-            <li>Stable names are less dependent on one subjective weighting choice.</li>
-            <li>Age, minutes, and market value are only practical context fields.</li>
-            <li>Final decisions still need video, tactical role fit, medical, contract, and fee work.</li>
-          </ul>
-        </div>
-      </div>
+      <div class="section-head"><h2>Transition Chaos Map</h2></div>
+      <div class="copy"><p>United's issue is not only ball-winning. It is the number of unstable moments after possession breaks. This chart highlights players who regain or stabilize play without creating new problems.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/transition_chaos_map.png" alt="Transition chaos map"></div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>Watchlist: Removed By Defensive Gate</h2>
-        <p>These players remain analytically interesting, but they do not clear the light defensive-protection threshold used for the published shortlist.</p>
+      <div class="section-head"><h2>Progression Type</h2></div>
+      <div class="copy"><p>Progression is not one skill. Some midfielders move the ball through passing, others through carrying. United should know which type they are buying.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/progression_type_chart.png" alt="Progression type chart"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Casemiro and Ugarte References</h2></div>
+      <div class="copy"><p>Casemiro is an ageing defensive responsibility reference, not the clone target. Ugarte already covers much of the defence/security base, but his low progression score suggests United may still need a complementary midfielder who can add control without limiting progression.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/casemiro_candidate_radar.png" alt="Radar comparison"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Sensitivity and Practicality</h2></div>
+      <div class="copy">
+        <p>Sensitivity analysis tests whether the shortlist depends too heavily on one subjective weighting choice. A robust candidate remains near the top under several reasonable versions of the model. A fragile candidate ranks highly only when the model favors one specific trait.</p>
+        <p>Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.</p>
+        <p>If Palacios drops in defensive-heavy scenarios, that confirms he is a control candidate whose defensive translation needs review. If Cardoso stays high across base, defensive-heavy, and possession-heavy scenarios, that supports his two-axis fit. If a player rises only in progression-heavy scenarios, he may be more of a progression specialist than a Casemiro replacement profile. If a player ranks well defensively but poorly in possession-heavy scenarios, he may recreate the original control problem.</p>
       </div>
-      <div style="padding: 24px 26px;"><table class="dataframe data-table watchlist-table">
+      <div class="chart-card"><img class="chart" src="charts/sensitivity_rank_stability.png" alt="Sensitivity rank stability"></div>
+      <div class="copy"><table border="1" class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>scenario</th>
+      <th>player</th>
+      <th>rank_base</th>
+      <th>rank_defensive_heavy</th>
+      <th>rank_possession_heavy</th>
+      <th>rank_transition_heavy</th>
+      <th>rank_progression_heavy</th>
+      <th>rank_equal_weight</th>
+      <th>rank_range</th>
+      <th>rank_stability_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th></th>
+      <td>Exequiel Palacios</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Johnny Cardoso</td>
+      <td>2</td>
+      <td>1</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+      <td>2</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Morten Hjulmand</td>
+      <td>3</td>
+      <td>4</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Mats Wieffer</td>
+      <td>5</td>
+      <td>5</td>
+      <td>4</td>
+      <td>5</td>
+      <td>5</td>
+      <td>4</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Florentino Luís</td>
+      <td>4</td>
+      <td>3</td>
+      <td>5</td>
+      <td>4</td>
+      <td>7</td>
+      <td>6</td>
+      <td>4</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Adam Wharton</td>
+      <td>6</td>
+      <td>7</td>
+      <td>6</td>
+      <td>6</td>
+      <td>4</td>
+      <td>5</td>
+      <td>3</td>
+      <td>25.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Alan Varela</td>
+      <td>7</td>
+      <td>6</td>
+      <td>7</td>
+      <td>7</td>
+      <td>6</td>
+      <td>7</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Ederson</td>
+      <td>8</td>
+      <td>8</td>
+      <td>8</td>
+      <td>8</td>
+      <td>8</td>
+      <td>8</td>
+      <td>0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Carlos Baleba</td>
+      <td>9</td>
+      <td>10</td>
+      <td>9</td>
+      <td>9</td>
+      <td>9</td>
+      <td>9</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>João Gomes</td>
+      <td>10</td>
+      <td>9</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>1</td>
+      <td>75.0</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Amadou Onana</td>
+      <td>11</td>
+      <td>11</td>
+      <td>11</td>
+      <td>11</td>
+      <td>11</td>
+      <td>11</td>
+      <td>0</td>
+      <td>100.0</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Archetype Summary</h2><p>The model gives the answer. The diagnostic charts explain the answer.</p></div>
+      <div class="chart-card"><img class="chart" src="charts/archetype_summary.png" alt="Archetype summary"></div>
+      <div class="copy"><table border="1" class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>player</th>
+      <th>club</th>
+      <th>final_score</th>
+      <th>archetype_label</th>
+      <th>strongest_category</th>
+      <th>weakest_category</th>
+      <th>gate_margin</th>
+      <th>analyst_note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Exequiel Palacios</td>
+      <td>Bayer Leverkusen</td>
+      <td>73.77</td>
+      <td>Control profile</td>
+      <td>possession_security</td>
+      <td>age_availability</td>
+      <td>2.50</td>
+      <td>Borderline defensive-gate profile; strongest in possession security, weakest in age availability. Role and video review should test defensive translation.</td>
+    </tr>
+    <tr>
+      <td>Johnny Cardoso</td>
+      <td>Atletico Madrid</td>
+      <td>70.00</td>
+      <td>Two-axis defensive/security fit</td>
+      <td>defensive_protection</td>
+      <td>age_availability</td>
+      <td>40.00</td>
+      <td>Strongest in defensive protection; weakest in age availability. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Manuel Ugarte</td>
+      <td>Manchester United</td>
+      <td>61.70</td>
+      <td>Two-axis defensive/security fit</td>
+      <td>defensive_protection</td>
+      <td>progressive_value</td>
+      <td>39.17</td>
+      <td>Strongest in defensive protection; weakest in progressive value. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Elliot Anderson</td>
+      <td>Nottingham Forest</td>
+      <td>61.66</td>
+      <td>Removed by defensive gate</td>
+      <td>progressive_value</td>
+      <td>defensive_protection</td>
+      <td>-2.50</td>
+      <td>Below the light defensive gate by 2.5 points; keep for video/context review rather than treating as rejected.</td>
+    </tr>
+    <tr>
+      <td>Morten Hjulmand</td>
+      <td>Sporting CP</td>
+      <td>58.82</td>
+      <td>Watchlist / role-context needed</td>
+      <td>defensive_protection</td>
+      <td>transition_control</td>
+      <td>24.17</td>
+      <td>Strongest in defensive protection; weakest in transition control. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Florentino Luís</td>
+      <td>Burnley</td>
+      <td>58.54</td>
+      <td>Defensive-floor anchor</td>
+      <td>defensive_protection</td>
+      <td>progressive_value</td>
+      <td>50.83</td>
+      <td>Strongest in defensive protection; weakest in progressive value. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Angelo Stiller</td>
+      <td>Stuttgart</td>
+      <td>56.68</td>
+      <td>Removed by defensive gate</td>
+      <td>possession_security</td>
+      <td>defensive_protection</td>
+      <td>-36.67</td>
+      <td>Below the light defensive gate by 36.7 points; keep for video/context review rather than treating as rejected.</td>
+    </tr>
+    <tr>
+      <td>Mats Wieffer</td>
+      <td>Brighton &amp; Hove Albion</td>
+      <td>56.57</td>
+      <td>Watchlist / role-context needed</td>
+      <td>defensive_protection</td>
+      <td>transition_control</td>
+      <td>15.00</td>
+      <td>Strongest in defensive protection; weakest in transition control. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Adam Wharton</td>
+      <td>Crystal Palace</td>
+      <td>54.61</td>
+      <td>Watchlist / role-context needed</td>
+      <td>progressive_value</td>
+      <td>age_availability</td>
+      <td>5.00</td>
+      <td>Borderline defensive-gate profile; strongest in progressive value, weakest in age availability. Role and video review should test defensive translation.</td>
+    </tr>
+    <tr>
+      <td>Hugo Larsson</td>
+      <td>Eintracht Frankfurt</td>
+      <td>54.29</td>
+      <td>Removed by defensive gate</td>
+      <td>possession_security</td>
+      <td>defensive_protection</td>
+      <td>-6.25</td>
+      <td>Below the light defensive gate by 6.2 points; keep for video/context review rather than treating as rejected.</td>
+    </tr>
+    <tr>
+      <td>Alan Varela</td>
+      <td>Porto</td>
+      <td>53.32</td>
+      <td>Watchlist / role-context needed</td>
+      <td>transition_control</td>
+      <td>progressive_value</td>
+      <td>12.50</td>
+      <td>Strongest in transition control; weakest in progressive value. Use video to test role fit.</td>
+    </tr>
+    <tr>
+      <td>Aleix Garcia</td>
+      <td>Bayer Leverkusen</td>
+      <td>53.21</td>
+      <td>Removed by defensive gate</td>
+      <td>possession_security</td>
+      <td>defensive_protection</td>
+      <td>-38.33</td>
+      <td>Below the light defensive gate by 38.3 points; keep for video/context review rather than treating as rejected.</td>
+    </tr>
+  </tbody>
+</table></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Watchlist: Removed by Defensive Gate</h2></div>
+      <div class="copy">
+        <p>These players remain analytically interesting. They are not rejected; they are moved to video/context review. The defensive gate is not a claim that players below the threshold cannot defend. It is a minimum-evidence filter for this specific role profile.</p>
+        <table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
       <th>Player</th>
       <th>Club</th>
       <th>Score</th>
       <th>Defence</th>
-      <th>Main Risk</th>
-      <th>Risk Score</th>
+      <th>Gate margin</th>
+      <th>Lowest category</th>
+      <th>Context note</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>Elliot Anderson</td>
       <td>Nottingham Forest</td>
-      <td>62.66</td>
+      <td>61.66</td>
       <td>42.50</td>
+      <td>-2.50</td>
       <td>defensive_protection</td>
-      <td>42.50</td>
+      <td>May 2026 EPL target pool: high-cost controller, availability caveat</td>
     </tr>
     <tr>
       <td>Angelo Stiller</td>
       <td>Stuttgart</td>
-      <td>57.68</td>
+      <td>56.68</td>
       <td>8.33</td>
+      <td>-36.67</td>
       <td>defensive_protection</td>
-      <td>8.33</td>
+      <td>High-volume passer</td>
     </tr>
     <tr>
       <td>Hugo Larsson</td>
       <td>Eintracht Frankfurt</td>
-      <td>55.29</td>
+      <td>54.29</td>
       <td>38.75</td>
+      <td>-6.25</td>
       <td>defensive_protection</td>
-      <td>38.75</td>
+      <td>Bundesliga target pool: young two-way controller</td>
     </tr>
     <tr>
       <td>Aleix Garcia</td>
       <td>Bayer Leverkusen</td>
-      <td>54.14</td>
+      <td>53.21</td>
       <td>6.67</td>
+      <td>-38.33</td>
       <td>defensive_protection</td>
-      <td>6.67</td>
+      <td>Bundesliga target pool: possession controller, lighter duelling profile</td>
     </tr>
     <tr>
       <td>Samuele Ricci</td>
       <td>AC Milan</td>
-      <td>50.23</td>
+      <td>49.23</td>
       <td>28.75</td>
+      <td>-16.25</td>
       <td>defensive_protection</td>
-      <td>28.75</td>
+      <td>Serie A target pool: press-resistant possession profile</td>
     </tr>
     <tr>
       <td>Bruno Guimarães</td>
       <td>Newcastle United</td>
-      <td>48.86</td>
+      <td>47.92</td>
       <td>27.50</td>
+      <td>-17.50</td>
       <td>defensive_protection</td>
-      <td>27.50</td>
+      <td>Control creator, premium market</td>
     </tr>
     <tr>
       <td>Youssouf Fofana</td>
       <td>AC Milan</td>
-      <td>39.15</td>
+      <td>38.15</td>
       <td>36.25</td>
+      <td>-8.75</td>
       <td>possession_security</td>
-      <td>20.71</td>
+      <td>Serie A target pool: range, carries, and duels</td>
     </tr>
   </tbody>
-</table></div>
+</table>
+      </div>
     </section>
 
     <section>
-      <div class="section-head">
-        <h2>Limitations</h2>
-        <p>The strongest version of this project is honest about what public data can and cannot prove.</p>
+      <div class="section-head"><h2>Limitations</h2></div>
+      <div class="copy">
+        <ul>
+          <li>Public data cannot replace club scouting.</li>
+          <li>Aggregate stats lose role, possession, pressure, and team-context detail.</li>
+          <li>StatsBomb open data is limited to selected competitions.</li>
+          <li>Public statsbombpy access should not be treated as full 360 data access.</li>
+          <li>League strength and team style affect metrics.</li>
+          <li>Injury history and transfer feasibility require separate work.</li>
+          <li>The defensive gate is a screen, not a verdict.</li>
+        </ul>
       </div>
-      <div class="grid-2">
-        <div class="card">
-          <h3>What this does well</h3>
-          <p>It turns an abstract United need, "more control", into measurable screening traits: defensive protection, transition control, possession security, progression, and age/availability.</p>
-          <span class="pill">repeatable</span><span class="pill">transparent</span><span class="pill">portfolio-ready</span>
-        </div>
-        <div class="card">
-          <h3>What it cannot do</h3>
-          <p>It cannot replace club scouting. StatsBomb open data is limited to selected competitions, public aggregate stats are not proprietary club data, and public statsbombpy access should not be treated as 360 data access.</p>
-        </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Recommended Next Scouting Questions</h2></div>
+      <div class="copy">
+        <ul>
+          <li><strong>Palacios:</strong> Can his defensive work translate to United's transition-heavy environment? Is his availability/injury history acceptable? Does he receive under pressure in central zones or mainly in cleaner structures?</li>
+          <li><strong>Cardoso:</strong> Does his defensive range hold against Premier League tempo? Can he progress play enough to avoid becoming too conservative?</li>
+          <li><strong>Hjulmand:</strong> Is he clean enough under pressure to solve United's control issue?</li>
+          <li><strong>Florentino Luís:</strong> Is the possession limitation too severe for a control brief?</li>
+          <li><strong>Wieffer:</strong> Does he offer enough mobility and transition coverage?</li>
+        </ul>
       </div>
     </section>
   </main>
-  <footer>
-    Built with pandas, matplotlib, public aggregate player statistics, and StatsBomb open-data concepts for event-data role design. This is a screening framework, not a final recruitment decision model.
-  </footer>
+  <footer>Built with pandas, matplotlib, public aggregate player statistics, and StatsBomb open-data concepts for event-data role design. This is a screening framework, not a final recruitment decision model.</footer>
 </body>
 </html>

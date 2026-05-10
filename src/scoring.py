@@ -2,105 +2,166 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from .config import (
     ALLOWED_LEAGUES,
     CATEGORY_LABELS,
     CATEGORY_METRICS,
+    CATEGORY_WEIGHTS,
     EXCLUDED_SQUADS,
+    METRIC_ALIASES,
+    METRIC_GROUPS,
     MIN_DEFENSIVE_PROTECTION_SCORE,
     MIN_CATEGORY_SCORE,
     REQUIRE_ABOVE_MIN_EVERY_CATEGORY,
+    SENSITIVITY_SCENARIOS,
     SHORTLIST_SIZE,
-    WEIGHTS,
 )
-from .metrics import percentile_normalize, prepare_metrics
+from .metrics import (
+    calculate_per90,
+    add_age_availability_scores,
+    add_canonical_metric_aliases,
+    add_possession_risk_rates,
+    prepare_metrics,
+)
 
 
-def _score_metric(df: pd.DataFrame, metric: str) -> pd.Series:
-    """Return a 0-100 score for one metric.
+def calculate_per90_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    """Create per-90 metrics from raw counting fields."""
 
-    Normal public metrics are percentile-normalized with higher values treated
-    as better. Metrics ending in `_inv`, plus the engineered age and minutes
-    scores, are already expressed on a 0-100 scale and are only clipped.
-    Missing metrics receive a neutral score so optional public fields do not
-    break the pipeline.
+    return calculate_per90(df)
+
+
+def calculate_rate_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    """Create rate and per-touch metrics used by the score."""
+
+    out = add_possession_risk_rates(df)
+    out = add_age_availability_scores(out)
+    return add_canonical_metric_aliases(out)
+
+
+def percentile_score(series: pd.Series) -> pd.Series:
+    """Convert a numeric series to a 0-100 percentile-style score."""
+
+    numeric = pd.to_numeric(series, errors="coerce")
+    if numeric.notna().sum() == 0:
+        return pd.Series(50.0, index=series.index)
+    filled = numeric.fillna(numeric.median())
+    return filled.rank(pct=True, method="average") * 100
+
+
+def inverse_percentile_score(series: pd.Series) -> pd.Series:
+    """Convert a numeric series to a score where lower raw values are better."""
+
+    return 100 - percentile_score(series) + (100 / max(len(series), 1))
+
+
+def resolve_metric_column(df: pd.DataFrame, metric: str) -> str | None:
+    """Return the available dataframe column for a canonical metric name."""
+
+    if metric in df.columns:
+        return metric
+    alias = METRIC_ALIASES.get(metric)
+    if alias in df.columns:
+        return alias
+    return None
+
+
+def calculate_metric_percentiles(
+    df: pd.DataFrame, metric_groups: dict[str, list[dict[str, object]]] | None = None,
+) -> tuple[pd.DataFrame, list[dict[str, str]]]:
+    """Score every available input metric and record unavailable fields.
+
+    Each input metric is first resolved to an available raw or engineered
+    column. Higher-is-better metrics use ordinary percentiles; negative events
+    use inverse percentiles.
     """
 
-    if metric not in df.columns:
-        return pd.Series(50.0, index=df.index)
+    metric_groups = metric_groups or METRIC_GROUPS
+    out = df.copy()
+    unavailable: list[dict[str, str]] = []
 
-    if metric.endswith("_inv") or metric in {"age_score", "minutes_score"}:
-        return pd.to_numeric(df[metric], errors="coerce").fillna(50).clip(0, 100)
-    return percentile_normalize(df[metric])
+    for category, metrics in metric_groups.items():
+        for metric_info in metrics:
+            metric = str(metric_info["metric"])
+            raw_col = resolve_metric_column(out, metric)
+            score_col = f"{metric}_score"
+            if raw_col is None:
+                unavailable.append(
+                    {
+                        "category": category,
+                        "input_metric": metric,
+                        "reason": "No matching raw or engineered column in public dataset",
+                    }
+                )
+                continue
+            if bool(metric_info["higher_is_better"]):
+                out[score_col] = percentile_score(out[raw_col])
+            else:
+                out[score_col] = inverse_percentile_score(out[raw_col])
+    return out, unavailable
 
 
 def calculate_category_scores(
-    df: pd.DataFrame, category_metrics: dict[str, list[str]] | None = None,
+    df: pd.DataFrame, metric_groups: dict[str, list[dict[str, object]]] | None = None,
 ) -> pd.DataFrame:
-    """Calculate category scores as the mean of their normalized metrics.
+    """Average available input-metric scores into category scores."""
 
-    Each category deliberately remains simple and auditable. This is a public
-    recruitment screen, not a proprietary model, so category scores should be
-    easy to trace back to their component metrics.
-    """
-
-    category_metrics = category_metrics or CATEGORY_METRICS
+    metric_groups = metric_groups or METRIC_GROUPS
     out = df.copy()
-    for category, metrics in category_metrics.items():
-        metric_scores = pd.concat([_score_metric(out, metric) for metric in metrics], axis=1)
-        out[category] = metric_scores.mean(axis=1)
+    for category, metrics in metric_groups.items():
+        score_cols = [
+            f"{metric_info['metric']}_score"
+            for metric_info in metrics
+            if f"{metric_info['metric']}_score" in out.columns
+        ]
+        count_col = f"{category}_metric_count"
+        out[count_col] = len(score_cols)
+        if score_cols:
+            out[category] = out[score_cols].mean(axis=1)
+        else:
+            out[category] = 50.0
     return out
 
 
-def calculate_weighted_score(
+def calculate_total_score(
     df: pd.DataFrame,
-    weights: dict[str, float] | None = None,
+    category_weights: dict[str, float] | None = None,
     score_col: str = "control_midfielder_score",
 ) -> pd.DataFrame:
-    """Calculate the weighted total Control Midfielder Score.
+    """Calculate the weighted final score from category scores."""
 
-    Weights are normalized before scoring, which allows sensitivity scenarios
-    to increase or decrease a category weight without requiring the caller to
-    manually rebalance every other category.
-    """
-
-    weights = weights or WEIGHTS
-    normalized_weight_sum = sum(weights.values())
+    category_weights = category_weights or CATEGORY_WEIGHTS
+    weight_sum = sum(category_weights.values())
     out = df.copy()
     out[score_col] = 0.0
-    for category, weight in weights.items():
-        out[score_col] += out[category] * (weight / normalized_weight_sum)
+    for category, weight in category_weights.items():
+        out[score_col] += out[category] * (weight / weight_sum)
     out[score_col] = out[score_col].round(2)
     out["rank"] = out[score_col].rank(ascending=False, method="min").astype(int)
     return out.sort_values(score_col, ascending=False).reset_index(drop=True)
 
 
-def build_scoring_table(df: pd.DataFrame, weights: dict[str, float] | None = None) -> pd.DataFrame:
-    """Create the full scored player table from raw public stats.
-
-    This is the main pipeline entry point: engineer per-90 and risk metrics,
-    score each category, then calculate the total weighted score.
-    """
-
-    engineered = prepare_metrics(df)
-    categorized = calculate_category_scores(engineered)
-    scored = calculate_weighted_score(categorized, weights=weights)
-    for category in CATEGORY_METRICS:
-        scored[category] = scored[category].round(2)
-    return scored
-
-
-def filter_target_candidates(
-    scored: pd.DataFrame, require_balanced_profile: bool = REQUIRE_ABOVE_MIN_EVERY_CATEGORY,
+def apply_defensive_gate(
+    df: pd.DataFrame, gate_threshold: float = MIN_DEFENSIVE_PROTECTION_SCORE,
 ) -> pd.DataFrame:
-    """Apply the May 2026 recruitment-pool constraints.
+    """Add defensive-gate flags without deleting any player rows."""
 
-    The defensive gate is intentionally light. It removes pure control profiles
-    with limited ball-winning evidence, while keeping the project aligned with
-    the thesis that United need control as well as duel-winning.
-    """
+    out = df.copy()
+    out["passed_defensive_gate"] = out["defensive_protection"] >= gate_threshold
+    out["gate_margin"] = (out["defensive_protection"] - gate_threshold).round(2)
+    out["gate_status"] = np.select(
+        [out["gate_margin"].between(-5, 5, inclusive="both"), out["passed_defensive_gate"],],
+        ["Borderline / video review", "Passed gate"],
+        default="Watchlist: below gate",
+    )
+    return out
+
+
+def _base_target_pool(scored: pd.DataFrame) -> pd.DataFrame:
+    """Apply league, club, and target-pool constraints except the defensive gate."""
 
     out = scored.copy()
     if "is_target_candidate" in out.columns:
@@ -108,6 +169,29 @@ def filter_target_candidates(
     out = out[out["league"].isin(ALLOWED_LEAGUES)]
     out = out[~out["squad"].isin(EXCLUDED_SQUADS)]
     out = out[out["squad"].ne("Manchester United")]
+    return out.copy()
+
+
+def build_scoring_table(df: pd.DataFrame, weights: dict[str, float] | None = None,) -> pd.DataFrame:
+    """Create the full scored player table from raw public stats."""
+
+    engineered = prepare_metrics(df)
+    metric_scored, unavailable = calculate_metric_percentiles(engineered)
+    categorized = calculate_category_scores(metric_scored)
+    scored = calculate_total_score(categorized, category_weights=weights)
+    scored.attrs["unavailable_metrics"] = unavailable
+    for category in CATEGORY_METRICS:
+        scored[category] = scored[category].round(2)
+    scored = apply_defensive_gate(scored)
+    return scored
+
+
+def filter_target_candidates(
+    scored: pd.DataFrame, require_balanced_profile: bool = REQUIRE_ABOVE_MIN_EVERY_CATEGORY,
+) -> pd.DataFrame:
+    """Apply the May 2026 recruitment-pool constraints and defensive gate."""
+
+    out = _base_target_pool(scored)
     out = out[out["defensive_protection"] >= MIN_DEFENSIVE_PROTECTION_SCORE]
     if require_balanced_profile:
         category_cols = list(CATEGORY_METRICS.keys())
@@ -118,19 +202,10 @@ def filter_target_candidates(
 
 
 def make_filtered_out_watchlist(scored: pd.DataFrame) -> pd.DataFrame:
-    """Return otherwise eligible players removed by the defensive gate.
+    """Return otherwise eligible players removed by the defensive gate."""
 
-    Keeping this export makes the screening decision auditable: readers can see
-    which attractive public-data profiles were excluded and why.
-    """
-
-    full_pool = scored.copy()
-    if "is_target_candidate" in full_pool.columns:
-        full_pool = full_pool[full_pool["is_target_candidate"].astype(bool)]
-    full_pool = full_pool[full_pool["league"].isin(ALLOWED_LEAGUES)]
-    full_pool = full_pool[~full_pool["squad"].isin(EXCLUDED_SQUADS)]
-    full_pool = full_pool[full_pool["squad"].ne("Manchester United")]
-    excluded = full_pool[full_pool["defensive_protection"] < MIN_DEFENSIVE_PROTECTION_SCORE].copy()
+    excluded = _base_target_pool(scored)
+    excluded = excluded[excluded["defensive_protection"] < MIN_DEFENSIVE_PROTECTION_SCORE].copy()
     category_cols = list(CATEGORY_METRICS.keys())
     excluded["lowest_category"] = excluded[category_cols].idxmin(axis=1)
     excluded["lowest_category_score"] = excluded[category_cols].min(axis=1).round(2)
@@ -142,6 +217,9 @@ def make_filtered_out_watchlist(scored: pd.DataFrame) -> pd.DataFrame:
         "age",
         "control_midfielder_score",
         *category_cols,
+        "passed_defensive_gate",
+        "gate_margin",
+        "gate_status",
         "lowest_category",
         "lowest_category_score",
         "availability_note",
@@ -167,6 +245,10 @@ def make_shortlist(scored: pd.DataFrame, size: int = SHORTLIST_SIZE) -> pd.DataF
         "context_source_url",
         "control_midfielder_score",
         *CATEGORY_METRICS.keys(),
+        "passed_defensive_gate",
+        "gate_margin",
+        "gate_status",
+        *[f"{category}_metric_count" for category in CATEGORY_METRICS],
     ]
     return candidates.loc[:, [col for col in columns if col in candidates.columns]].head(size)
 
@@ -182,43 +264,173 @@ def make_category_scores(scored: pd.DataFrame, candidate_only: bool = True) -> p
     return category_scores
 
 
+def assign_archetype(row: pd.Series) -> str:
+    """Auto-label player profiles from category scores."""
+
+    defence = row["defensive_protection"]
+    security = row["possession_security"]
+    progression = row["progressive_value"]
+    gate_margin = row.get("gate_margin", defence - MIN_DEFENSIVE_PROTECTION_SCORE)
+
+    if defence < MIN_DEFENSIVE_PROTECTION_SCORE:
+        return "Removed by defensive gate"
+    if security >= 65 and defence >= 65:
+        return "Two-axis defensive/security fit"
+    if security >= 70 and defence < 65:
+        return "Control profile"
+    if defence >= 70 and security < 60:
+        return "Defensive-floor anchor"
+    if progression >= 70 and security >= 60:
+        return "Progressive controller"
+    if defence >= 65 and security < 40:
+        return "Low-control defensive specialist"
+    if abs(gate_margin) <= 5:
+        return "Watchlist / role-context needed"
+    return "Watchlist / role-context needed"
+
+
+def make_analyst_note(row: pd.Series) -> str:
+    """Create a short plain-English note for report tables."""
+
+    strongest = row["strongest_category"].replace("_", " ")
+    weakest = row["weakest_category"].replace("_", " ")
+    if not bool(row["passed_defensive_gate"]):
+        return (
+            f"Below the light defensive gate by {abs(row['gate_margin']):.1f} points; "
+            "keep for video/context review rather than treating as rejected."
+        )
+    if abs(row["gate_margin"]) <= 5:
+        return (
+            f"Borderline defensive-gate profile; strongest in {strongest}, weakest in {weakest}. "
+            "Role and video review should test defensive translation."
+        )
+    return f"Strongest in {strongest}; weakest in {weakest}. Use video to test role fit."
+
+
+def make_player_score_explanation(scored: pd.DataFrame) -> pd.DataFrame:
+    """Create player-level explainability output for analysts and recruiters."""
+
+    out = scored.copy()
+    category_cols = list(CATEGORY_METRICS.keys())
+    for category in category_cols:
+        out[f"{category}_rank"] = out[category].rank(ascending=False, method="min").astype(int)
+    out["strongest_category"] = out[category_cols].idxmax(axis=1)
+    out["weakest_category"] = out[category_cols].idxmin(axis=1)
+    out["archetype_label"] = out.apply(assign_archetype, axis=1)
+    out["analyst_note"] = out.apply(make_analyst_note, axis=1)
+    cols = [
+        "player",
+        "squad",
+        "league",
+        "age",
+        "control_midfielder_score",
+        *category_cols,
+        *[f"{category}_rank" for category in category_cols],
+        "strongest_category",
+        "weakest_category",
+        "passed_defensive_gate",
+        "gate_margin",
+        "archetype_label",
+        "analyst_note",
+    ]
+    explanation = out.loc[:, cols].rename(
+        columns={"squad": "club", "control_midfielder_score": "final_score",}
+    )
+    return explanation
+
+
+def make_metric_dictionary(
+    scored: pd.DataFrame, metric_groups: dict[str, list[dict[str, object]]] | None = None,
+) -> pd.DataFrame:
+    """Create an auditable data dictionary for every configured input metric."""
+
+    metric_groups = metric_groups or METRIC_GROUPS
+    rows = []
+    for category, metrics in metric_groups.items():
+        for metric_info in metrics:
+            metric = str(metric_info["metric"])
+            raw_col = resolve_metric_column(scored, metric)
+            rows.append(
+                {
+                    "category": category,
+                    "input_metric": metric,
+                    "raw_column_used": raw_col or "",
+                    "transformation": "Percentile score"
+                    if bool(metric_info["higher_is_better"])
+                    else "Inverse percentile score",
+                    "higher_is_better": bool(metric_info["higher_is_better"]),
+                    "explanation": metric_info.get("explanation", ""),
+                    "caveat": metric_info.get("caveat", ""),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def calculate_weighted_score(
+    df: pd.DataFrame,
+    weights: dict[str, float] | None = None,
+    score_col: str = "control_midfielder_score",
+) -> pd.DataFrame:
+    """Backwards-compatible wrapper for older notebooks."""
+
+    return calculate_total_score(df, category_weights=weights, score_col=score_col)
+
+
+def run_sensitivity_analysis(
+    scored_input: pd.DataFrame,
+    scenarios: dict[str, dict[str, float]] | None = None,
+    top_n: int = SHORTLIST_SIZE,
+) -> pd.DataFrame:
+    """Calculate rank stability across defined weighting scenarios."""
+
+    scenarios = scenarios or SENSITIVITY_SCENARIOS
+    base_pool = filter_target_candidates(scored_input).head(top_n)
+    player_pool = base_pool["player"].tolist()
+
+    scenario_frames = []
+    for scenario_name, weights in scenarios.items():
+        scenario_scores = calculate_total_score(scored_input.copy(), category_weights=weights)
+        scenario_subset = filter_target_candidates(scenario_scores)
+        scenario_subset = scenario_subset[scenario_subset["player"].isin(player_pool)]
+        scenario_subset = scenario_subset[["player", "rank", "control_midfielder_score"]].copy()
+        scenario_subset["scenario"] = scenario_name
+        scenario_frames.append(scenario_subset)
+
+    long = pd.concat(scenario_frames, ignore_index=True)
+    rank_pivot = long.pivot_table(index="player", columns="scenario", values="rank", aggfunc="min")
+    for scenario in scenarios:
+        if scenario not in rank_pivot.columns:
+            rank_pivot[scenario] = np.nan
+    rank_pivot = rank_pivot[list(scenarios.keys())]
+    rank_pivot = rank_pivot.rename(columns={name: f"rank_{name}" for name in rank_pivot.columns})
+    rank_cols = list(rank_pivot.columns)
+    rank_pivot["best_rank"] = rank_pivot[rank_cols].min(axis=1)
+    rank_pivot["worst_rank"] = rank_pivot[rank_cols].max(axis=1)
+    rank_pivot["rank_range"] = rank_pivot["worst_rank"] - rank_pivot["best_rank"]
+    rank_pivot["average_rank"] = rank_pivot[rank_cols].mean(axis=1).round(2)
+    max_range = rank_pivot["rank_range"].max()
+    if pd.isna(max_range) or max_range == 0:
+        rank_pivot["rank_stability_score"] = 100.0
+    else:
+        rank_pivot["rank_stability_score"] = (
+            100 - (rank_pivot["rank_range"] / max_range * 100)
+        ).round(2)
+    rank_pivot = rank_pivot.reset_index()
+    return rank_pivot.sort_values(["average_rank", "rank_base"]).reset_index(drop=True)
+
+
 def sensitivity_analysis(
     scored_input: pd.DataFrame,
     base_weights: dict[str, float] | None = None,
     swing: float = 0.10,
     top_n: int = SHORTLIST_SIZE,
 ) -> pd.DataFrame:
-    """Test how top-candidate ranks move when category weights shift.
+    """Backwards-compatible sensitivity wrapper.
 
-    The output is designed for defensibility rather than optimization. It
-    shows whether the shortlist is robust to reasonable category-weight changes
-    or whether one assumption drives the ranking too heavily.
+    The new output is wide and includes rank stability; `base_weights` and
+    `swing` are accepted for older notebook calls but no longer drive the
+    scenario set.
     """
 
-    base_weights = base_weights or WEIGHTS
-    scenarios = [("Base weights", base_weights)]
-    for category in base_weights:
-        up = base_weights.copy()
-        down = base_weights.copy()
-        up[category] *= 1 + swing
-        down[category] *= 1 - swing
-        scenarios.append((f"{category} +{int(swing * 100)}%", up))
-        scenarios.append((f"{category} -{int(swing * 100)}%", down))
-
-    candidate_scored = filter_target_candidates(scored_input)
-    candidate_pool = candidate_scored.head(top_n)["player"].tolist()
-    rows = []
-    for scenario_name, weights in scenarios:
-        scenario_scores = calculate_weighted_score(scored_input.copy(), weights=weights)
-        scenario_subset = filter_target_candidates(scenario_scores)
-        scenario_subset = scenario_subset[scenario_subset["player"].isin(candidate_pool)]
-        for _, row in scenario_subset.iterrows():
-            rows.append(
-                {
-                    "scenario": scenario_name,
-                    "player": row["player"],
-                    "rank": int(row["rank"]),
-                    "control_midfielder_score": row["control_midfielder_score"],
-                }
-            )
-    return pd.DataFrame(rows)
+    _ = base_weights, swing
+    return run_sensitivity_analysis(scored_input, top_n=top_n)
