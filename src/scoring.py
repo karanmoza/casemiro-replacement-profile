@@ -275,6 +275,11 @@ def make_category_scores(scored: pd.DataFrame, candidate_only: bool = True) -> p
 def assign_archetype(row: pd.Series) -> str:
     """Auto-label player profiles from category scores."""
 
+    if row.get("player") == "Manuel Ugarte":
+        return "Reference profile - current United player"
+    if row.get("player") == "Casemiro":
+        return "Reference profile - Casemiro baseline"
+
     defence = row["defensive_protection"]
     security = row["possession_security"]
     progression = row["progressive_value"]
@@ -299,6 +304,17 @@ def assign_archetype(row: pd.Series) -> str:
 
 def make_analyst_note(row: pd.Series) -> str:
     """Create a short plain-English note for report tables."""
+
+    if row.get("player") == "Manuel Ugarte":
+        return (
+            "Current United player used as an internal reference profile, not a target. "
+            "Strong defence/security base but progression remains the key comparison point."
+        )
+    if row.get("player") == "Casemiro":
+        return (
+            "Casemiro baseline used to anchor the defensive responsibility question, "
+            "not as a clone target."
+        )
 
     strongest = row.get("strongest_football_category", row["strongest_category"]).replace("_", " ")
     weakest = row.get("weakest_football_category", row["weakest_category"]).replace("_", " ")

@@ -150,6 +150,8 @@ Scenarios:
 
 Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority. The output includes `average_rank` and `rank_volatility_score` so the ranking can be audited without relying only on the base-case score.
 
+Lower rank volatility means the player's rank is more stable across weighting scenarios. Average rank should be read alongside volatility, because a player can be stable but still consistently lower-ranked.
+
 ## Diagnostic Charts
 
 The final score uses all five categories, but the diagnostic charts intentionally use smaller subsets of input metrics. This avoids every plot telling the same story and helps identify why a player scores well: defensive activity, possession security, transition safety, or progression type.
@@ -189,6 +191,12 @@ Charts:
 ## Key Interpretation
 
 Palacios leads the screen as a possession-control candidate, not as a like-for-like Casemiro replacement. Cardoso is the cleaner two-axis defensive/security fit. Casemiro and Manuel Ugarte are reference players in the report, not transfer targets. Borderline and watchlist players should be reviewed through video and tactical role context.
+
+## What the Screen Actually Suggests
+
+The screen does not produce one obvious answer. It produces three useful archetypes. Palacios is the control/progression leader but needs defensive translation and availability review. Cardoso is the cleaner two-axis defensive/security fit. Hjulmand, Florentino Luís, and Wieffer preserve more defensive floor but raise different possession or progression questions.
+
+That is the value of the model: it narrows the next scouting conversation rather than pretending to finish it.
 
 ## Limitations
 

@@ -229,6 +229,8 @@ def rel_path(path: str | Path, start: str | Path) -> str:
 
 def table_html(df: pd.DataFrame, max_rows: int | None = None) -> str:
     display = df.copy()
+    display.columns.name = None
+    display.index.name = None
     if max_rows is not None:
         display = display.head(max_rows)
     for col in display.select_dtypes(include="number").columns:
@@ -610,6 +612,7 @@ def save_html_report(
       <div class="copy">
         <p>Sensitivity analysis tests whether the shortlist depends too heavily on one subjective weighting choice. A robust candidate remains near the top under several reasonable versions of the model. A fragile candidate ranks highly only when the model favors one specific trait.</p>
         <p>Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.</p>
+        <p>Lower rank volatility means the player's rank is more stable across weighting scenarios. Average rank should be read alongside volatility, because a player can be stable but still consistently lower-ranked.</p>
         <p>If Palacios drops in defensive-heavy scenarios, that confirms he is a control candidate whose defensive translation needs review. If Cardoso stays high across base, defensive-heavy, and possession-heavy scenarios, that supports his two-axis fit. If a player rises only in progression-heavy scenarios, he may be more of a progression specialist than a Casemiro replacement profile. If a player ranks well defensively but poorly in possession-heavy scenarios, he may recreate the original control problem.</p>
       </div>
       <div class="chart-card"><img class="chart" src="{chart_rel['sensitivity_stability']}" alt="Sensitivity rank volatility"></div>
@@ -650,6 +653,14 @@ def save_html_report(
           <li>Injury history and transfer feasibility require separate work.</li>
           <li>The defensive gate is a screen, not a verdict.</li>
         </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>What the Screen Actually Suggests</h2></div>
+      <div class="copy">
+        <p>The screen does not produce one obvious answer. It produces three useful archetypes. Palacios is the control/progression leader but needs defensive translation and availability review. Cardoso is the cleaner two-axis defensive/security fit. Hjulmand, Florentino Luís, and Wieffer preserve more defensive floor but raise different possession or progression questions.</p>
+        <p>That is the value of the model: it narrows the next scouting conversation rather than pretending to finish it.</p>
       </div>
     </section>
 
@@ -803,9 +814,9 @@ def save_pdf_report(
         )
         _pdf_chart_page(
             pdf,
-            "Sensitivity Rank Stability",
+            "Sensitivity Rank Volatility",
             chart_paths["sensitivity_stability"],
-            "Robust candidates remain near the top under several reasonable weighting assumptions.",
+            "Lower rank volatility means the player's rank is more stable across weighting scenarios. Average rank should be read alongside volatility, because a player can be stable but still consistently lower-ranked.",
         )
         table_cols = [
             "rank",
@@ -884,7 +895,16 @@ def save_pdf_report(
                     "rank_volatility_score",
                 ]
             ].head(12),
-            "Average rank and rank volatility show whether the shortlist depends too heavily on one subjective weighting choice.",
+            "Average rank and rank volatility show whether the shortlist depends too heavily on one subjective weighting choice. Lower volatility is better only when the average rank is also strong.",
+        )
+        _pdf_text_page(
+            pdf,
+            "What the Screen Actually Suggests",
+            [
+                "The screen does not produce one obvious answer. It produces three useful archetypes.",
+                "Palacios is the control/progression leader but needs defensive translation and availability review. Cardoso is the cleaner two-axis defensive/security fit. Hjulmand, Florentino Luís, and Wieffer preserve more defensive floor but raise different possession or progression questions.",
+                "That is the value of the model: it narrows the next scouting conversation rather than pretending to finish it.",
+            ],
         )
     return path
 

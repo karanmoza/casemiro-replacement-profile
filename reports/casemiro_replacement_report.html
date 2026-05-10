@@ -627,13 +627,13 @@
       <div class="copy">
         <p>Sensitivity analysis tests whether the shortlist depends too heavily on one subjective weighting choice. A robust candidate remains near the top under several reasonable versions of the model. A fragile candidate ranks highly only when the model favors one specific trait.</p>
         <p>Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.</p>
+        <p>Lower rank volatility means the player's rank is more stable across weighting scenarios. Average rank should be read alongside volatility, because a player can be stable but still consistently lower-ranked.</p>
         <p>If Palacios drops in defensive-heavy scenarios, that confirms he is a control candidate whose defensive translation needs review. If Cardoso stays high across base, defensive-heavy, and possession-heavy scenarios, that supports his two-axis fit. If a player rises only in progression-heavy scenarios, he may be more of a progression specialist than a Casemiro replacement profile. If a player ranks well defensively but poorly in possession-heavy scenarios, he may recreate the original control problem.</p>
       </div>
       <div class="chart-card"><img class="chart" src="charts/sensitivity_rank_stability.png" alt="Sensitivity rank volatility"></div>
       <div class="copy"><table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
-      <th>scenario</th>
       <th>Player</th>
       <th>Base</th>
       <th>Def-heavy</th>
@@ -648,7 +648,6 @@
   </thead>
   <tbody>
     <tr>
-      <th></th>
       <td>Exequiel Palacios</td>
       <td>1</td>
       <td>2</td>
@@ -661,7 +660,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Johnny Cardoso</td>
       <td>2</td>
       <td>1</td>
@@ -674,7 +672,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Morten Hjulmand</td>
       <td>3</td>
       <td>4</td>
@@ -687,7 +684,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Mats Wieffer</td>
       <td>5</td>
       <td>5</td>
@@ -700,7 +696,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Florentino Luís</td>
       <td>4</td>
       <td>3</td>
@@ -713,7 +708,6 @@
       <td>100.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Adam Wharton</td>
       <td>6</td>
       <td>7</td>
@@ -726,7 +720,6 @@
       <td>75.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Alan Varela</td>
       <td>7</td>
       <td>6</td>
@@ -739,7 +732,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Ederson</td>
       <td>8</td>
       <td>8</td>
@@ -752,7 +744,6 @@
       <td>0.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Carlos Baleba</td>
       <td>9</td>
       <td>10</td>
@@ -765,7 +756,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>João Gomes</td>
       <td>10</td>
       <td>9</td>
@@ -778,7 +768,6 @@
       <td>25.0</td>
     </tr>
     <tr>
-      <th></th>
       <td>Amadou Onana</td>
       <td>11</td>
       <td>11</td>
@@ -835,11 +824,11 @@
       <td>Manuel Ugarte</td>
       <td>Manchester United</td>
       <td>61.70</td>
-      <td>Two-axis defensive/security fit</td>
+      <td>Reference profile - current United player</td>
       <td>defensive_protection</td>
       <td>progressive_value</td>
       <td>39.17</td>
-      <td>Strongest in defensive protection; weakest in progressive value. Use video to test role fit.</td>
+      <td>Current United player used as an internal reference profile, not a target. Strong defence/security base but progression remains the key comparison point.</td>
     </tr>
     <tr>
       <td>Elliot Anderson</td>
@@ -1063,6 +1052,14 @@
           <li>Injury history and transfer feasibility require separate work.</li>
           <li>The defensive gate is a screen, not a verdict.</li>
         </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>What the Screen Actually Suggests</h2></div>
+      <div class="copy">
+        <p>The screen does not produce one obvious answer. It produces three useful archetypes. Palacios is the control/progression leader but needs defensive translation and availability review. Cardoso is the cleaner two-axis defensive/security fit. Hjulmand, Florentino Luís, and Wieffer preserve more defensive floor but raise different possession or progression questions.</p>
+        <p>That is the value of the model: it narrows the next scouting conversation rather than pretending to finish it.</p>
       </div>
     </section>
 
