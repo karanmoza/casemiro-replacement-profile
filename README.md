@@ -130,7 +130,10 @@ The defensive gate is therefore a light screening threshold. It is not a scoutin
 
 Palacios clears the defensive gate narrowly, so he should not be treated as a pure defensive replacement. Elliot Anderson falls just below the gate, so he should remain a watchlist player rather than be treated as definitively rejected. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.
 
-This is why the report separates the published shortlist from the watchlist rather than deleting below-gate players entirely.
+This is why the report separates the published shortlist from two watchlist groups rather than deleting below-gate players entirely:
+
+- `borderline_watchlist.csv`: players within five points below the gate, where video and role review should decide whether the public-data signal is too harsh.
+- `role_mismatch_watchlist.csv`: players further below the gate, who may still be useful footballers but are less aligned with this specific Casemiro-replacement control brief.
 
 ## Sensitivity Analysis
 
@@ -145,7 +148,7 @@ Scenarios:
 - Progression-heavy: defensive 25, transition 20, possession 20, progressive 30, age 5
 - Equal-weight football profile: defensive 25, transition 25, possession 25, progressive 20, age 5
 
-Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.
+Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority. The output includes `average_rank` and `rank_volatility_score` so the ranking can be audited without relying only on the base-case score.
 
 ## Diagnostic Charts
 
@@ -163,6 +166,8 @@ Tables:
 
 - `outputs/candidate_shortlist.csv`
 - `outputs/watchlist_removed_by_gate.csv`
+- `outputs/borderline_watchlist.csv`
+- `outputs/role_mismatch_watchlist.csv`
 - `outputs/category_scores.csv`
 - `outputs/player_score_explanation.csv`
 - `outputs/metric_dictionary.csv`
@@ -183,7 +188,7 @@ Charts:
 
 ## Key Interpretation
 
-Palacios leads the screen as a possession-control candidate, not as a like-for-like Casemiro replacement. Cardoso is the cleaner two-axis defensive/security fit. Borderline and watchlist players should be reviewed through video and tactical role context.
+Palacios leads the screen as a possession-control candidate, not as a like-for-like Casemiro replacement. Cardoso is the cleaner two-axis defensive/security fit. Casemiro and Manuel Ugarte are reference players in the report, not transfer targets. Borderline and watchlist players should be reviewed through video and tactical role context.
 
 ## Limitations
 

@@ -20,6 +20,8 @@ from .config import (
 REQUIRED_OUTPUTS = [
     OUTPUT_DIR / "candidate_shortlist.csv",
     OUTPUT_DIR / "watchlist_removed_by_gate.csv",
+    OUTPUT_DIR / "borderline_watchlist.csv",
+    OUTPUT_DIR / "role_mismatch_watchlist.csv",
     OUTPUT_DIR / "category_scores.csv",
     OUTPUT_DIR / "player_score_explanation.csv",
     OUTPUT_DIR / "metric_dictionary.csv",
@@ -52,7 +54,7 @@ REQUIRED_SENSITIVITY_COLUMNS = {
     "worst_rank",
     "rank_range",
     "average_rank",
-    "rank_stability_score",
+    "rank_volatility_score",
 }
 
 
@@ -71,6 +73,8 @@ def validate_scores() -> None:
     shortlist = pd.read_csv(OUTPUT_DIR / "candidate_shortlist.csv")
     explanation = pd.read_csv(OUTPUT_DIR / "player_score_explanation.csv")
     watchlist = pd.read_csv(OUTPUT_DIR / "watchlist_removed_by_gate.csv")
+    borderline = pd.read_csv(OUTPUT_DIR / "borderline_watchlist.csv")
+    role_mismatch = pd.read_csv(OUTPUT_DIR / "role_mismatch_watchlist.csv")
 
     _assert(abs(sum(CATEGORY_WEIGHTS.values()) - 1.0) < 1e-9, "Category weights must sum to 1")
     _assert(shortlist["player"].notna().all(), "Shortlist has missing player names")
@@ -85,6 +89,15 @@ def validate_scores() -> None:
 
     overlap = set(shortlist["player"]) & set(watchlist["player"])
     _assert(not overlap, f"Players appear in both shortlist and watchlist: {sorted(overlap)}")
+    split_overlap = set(borderline["player"]) & set(role_mismatch["player"])
+    _assert(
+        not split_overlap, f"Players appear in both watchlist splits: {sorted(split_overlap)}",
+    )
+    split_players = set(borderline["player"]) | set(role_mismatch["player"])
+    _assert(
+        split_players == set(watchlist["player"]),
+        "Borderline and role-mismatch watchlists must cover the full below-gate watchlist",
+    )
     _assert(
         (shortlist["defensive_protection"] >= MIN_DEFENSIVE_PROTECTION_SCORE).all(),
         "Shortlist includes a player below the defensive gate",
@@ -93,6 +106,16 @@ def validate_scores() -> None:
         (watchlist["defensive_protection"] < MIN_DEFENSIVE_PROTECTION_SCORE).all(),
         "Watchlist includes a player above the defensive gate",
     )
+    if not borderline.empty:
+        _assert(
+            borderline["gate_margin"].between(-5, 0, inclusive="both").all(),
+            "Borderline watchlist includes a player outside the -5 to 0 gate-margin band",
+        )
+    if not role_mismatch.empty:
+        _assert(
+            ~role_mismatch["gate_margin"].between(-5, 0, inclusive="both").any(),
+            "Role-mismatch watchlist includes a borderline player",
+        )
 
 
 def validate_sensitivity() -> None:
@@ -100,8 +123,8 @@ def validate_sensitivity() -> None:
     missing = REQUIRED_SENSITIVITY_COLUMNS - set(sensitivity.columns)
     _assert(not missing, f"Missing sensitivity columns: {sorted(missing)}")
     _assert(
-        sensitivity["rank_stability_score"].between(0, 100).all(),
-        "Rank stability score outside 0-100",
+        sensitivity["rank_volatility_score"].between(0, 100).all(),
+        "Rank volatility score outside 0-100",
     )
 
 

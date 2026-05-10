@@ -421,7 +421,7 @@ def save_sensitivity_rank_stability(sensitivity: pd.DataFrame, path: str | Path)
     ax.invert_yaxis()
     ax.invert_xaxis()
     ax.set_xlabel("Rank across sensitivity scenarios")
-    ax.set_title("Sensitivity Rank Stability", loc="left", pad=20)
+    ax.set_title("Sensitivity Rank Volatility", loc="left", pad=20)
     ax.legend(frameon=False, loc="lower right")
     return _save(fig, path)
 
@@ -430,7 +430,14 @@ def save_sensitivity_chart(sensitivity: pd.DataFrame, path: str | Path) -> Path:
     """Save heatmap for scenario ranks."""
 
     setup_style()
-    rank_cols = [col for col in sensitivity.columns if col.startswith("rank_")]
+    rank_cols = [
+        "rank_base",
+        "rank_defensive_heavy",
+        "rank_possession_heavy",
+        "rank_transition_heavy",
+        "rank_progression_heavy",
+        "rank_equal_weight",
+    ]
     data = sensitivity.set_index("player")[rank_cols].head(12)
     data.columns = [col.replace("rank_", "").replace("_", " ").title() for col in data.columns]
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -455,10 +462,20 @@ def save_archetype_summary(explanation: pd.DataFrame, path: str | Path) -> Path:
 
     setup_style()
     display = explanation.head(12)[
-        ["player", "archetype_label", "strongest_category", "weakest_category", "gate_margin"]
+        [
+            "player",
+            "archetype_label",
+            "strongest_football_category",
+            "weakest_football_category",
+            "gate_margin",
+        ]
     ].copy()
-    display["strongest_category"] = display["strongest_category"].str.replace("_", " ").str.title()
-    display["weakest_category"] = display["weakest_category"].str.replace("_", " ").str.title()
+    display["strongest_football_category"] = (
+        display["strongest_football_category"].str.replace("_", " ").str.title()
+    )
+    display["weakest_football_category"] = (
+        display["weakest_football_category"].str.replace("_", " ").str.title()
+    )
     fig, ax = plt.subplots(figsize=(13, 7))
     ax.axis("off")
     table = ax.table(

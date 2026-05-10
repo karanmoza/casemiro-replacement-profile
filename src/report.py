@@ -36,6 +36,7 @@ from .scoring import (
     make_player_score_explanation,
     make_shortlist,
     run_sensitivity_analysis,
+    split_watchlists,
 )
 from .visualisations import (
     COLOR_GRAY,
@@ -78,6 +79,7 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
     shortlist = make_shortlist(scored)
     category_scores = make_category_scores(scored)
     watchlist = make_filtered_out_watchlist(scored)
+    borderline_watchlist, role_mismatch_watchlist = split_watchlists(watchlist)
     score_explanation = make_player_score_explanation(scored)
     sensitivity = run_sensitivity_analysis(scored)
     metric_dictionary = make_metric_dictionary(scored)
@@ -87,6 +89,8 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
         "candidate_shortlist": OUTPUT_DIR / "candidate_shortlist.csv",
         "category_scores": OUTPUT_DIR / "category_scores.csv",
         "watchlist_removed_by_gate": OUTPUT_DIR / "watchlist_removed_by_gate.csv",
+        "borderline_watchlist": OUTPUT_DIR / "borderline_watchlist.csv",
+        "role_mismatch_watchlist": OUTPUT_DIR / "role_mismatch_watchlist.csv",
         "filtered_out_watchlist": OUTPUT_DIR / "filtered_out_watchlist.csv",
         "player_score_explanation": OUTPUT_DIR / "player_score_explanation.csv",
         "metric_dictionary": OUTPUT_DIR / "metric_dictionary.csv",
@@ -99,6 +103,8 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
     shortlist.to_csv(paths["candidate_shortlist"], index=False)
     category_scores.to_csv(paths["category_scores"], index=False)
     watchlist.to_csv(paths["watchlist_removed_by_gate"], index=False)
+    borderline_watchlist.to_csv(paths["borderline_watchlist"], index=False)
+    role_mismatch_watchlist.to_csv(paths["role_mismatch_watchlist"], index=False)
     watchlist.to_csv(paths["filtered_out_watchlist"], index=False)
     score_explanation.to_csv(paths["player_score_explanation"], index=False)
     metric_dictionary.to_csv(paths["metric_dictionary"], index=False)
@@ -148,6 +154,8 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
         shortlist=shortlist,
         category_scores=category_scores,
         watchlist=watchlist,
+        borderline_watchlist=borderline_watchlist,
+        role_mismatch_watchlist=role_mismatch_watchlist,
         score_explanation=score_explanation,
         sensitivity=sensitivity,
         metric_dictionary=metric_dictionary,
@@ -158,6 +166,8 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
         scored=scored,
         shortlist=shortlist,
         watchlist=watchlist,
+        borderline_watchlist=borderline_watchlist,
+        role_mismatch_watchlist=role_mismatch_watchlist,
         score_explanation=score_explanation,
         sensitivity=sensitivity,
         chart_paths=chart_paths,
@@ -167,6 +177,8 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
         scored=scored,
         shortlist=shortlist,
         watchlist=watchlist,
+        borderline_watchlist=borderline_watchlist,
+        role_mismatch_watchlist=role_mismatch_watchlist,
         score_explanation=score_explanation,
         sensitivity=sensitivity,
         chart_paths=chart_paths,
@@ -183,8 +195,10 @@ def generate_outputs(input_csv: str | Path | None = None) -> dict[str, Path]:
 
 
 def _make_context_sources() -> pd.DataFrame:
-    context_sources = pd.DataFrame.from_dict(PLAYER_CONTEXT_MAY_2026, orient="index").reset_index(
-        names="player"
+    context_sources = (
+        pd.DataFrame.from_dict(PLAYER_CONTEXT_MAY_2026, orient="index")
+        .reset_index()
+        .rename(columns={"index": "player"})
     )
     if "is_target_candidate" in context_sources.columns:
         context_sources["is_target_candidate"] = context_sources["is_target_candidate"].where(
@@ -223,18 +237,32 @@ def table_html(df: pd.DataFrame, max_rows: int | None = None) -> str:
 
 
 def metrics_table_for_html(metric_dictionary: pd.DataFrame) -> pd.DataFrame:
-    grouped = (
-        metric_dictionary.groupby("category")
-        .agg(
-            input_metrics=("input_metric", lambda values: ", ".join(values)),
-            transformation=("transformation", lambda values: "Percentile / inverse percentile"),
-            football_meaning=("explanation", lambda values: " ".join(values[:2])),
-        )
-        .reset_index()
+    """Return an explicit metric dictionary table for report readers."""
+
+    display = metric_dictionary.copy()
+    display["Category"] = display["category"].map(CATEGORY_LABELS)
+    display["Input metric"] = display["input_metric"].str.replace("_", " ").str.title()
+    display["Raw column"] = display["raw_column_used"].replace("", "Unavailable / skipped")
+    display["Direction"] = display["higher_is_better"].map(
+        {
+            True: "Positive input: higher raw value scores better",
+            False: "Inverted input: lower raw value scores better",
+        }
     )
-    grouped["category"] = grouped["category"].map(CATEGORY_LABELS)
-    grouped.columns = ["Category", "Input metrics", "Transformation", "What it means"]
-    return grouped
+    display["Transformation"] = display["transformation"]
+    display["Football meaning"] = display["explanation"]
+    display["Caveat"] = display["caveat"].fillna("")
+    return display[
+        [
+            "Category",
+            "Input metric",
+            "Raw column",
+            "Direction",
+            "Transformation",
+            "Football meaning",
+            "Caveat",
+        ]
+    ]
 
 
 def save_html_report(
@@ -242,6 +270,8 @@ def save_html_report(
     shortlist: pd.DataFrame,
     category_scores: pd.DataFrame,
     watchlist: pd.DataFrame,
+    borderline_watchlist: pd.DataFrame,
+    role_mismatch_watchlist: pd.DataFrame,
     score_explanation: pd.DataFrame,
     sensitivity: pd.DataFrame,
     metric_dictionary: pd.DataFrame,
@@ -271,6 +301,7 @@ def save_html_report(
             "transition_control",
             "possession_security",
             "progressive_value",
+            "age_availability",
             "gate_margin",
         ]
     ].rename(
@@ -285,55 +316,109 @@ def save_html_report(
             "transition_control": "Transition",
             "possession_security": "Security",
             "progressive_value": "Progression",
+            "age_availability": "Age / availability",
             "gate_margin": "Gate margin",
         }
     )
-    explanation_table = score_explanation[
-        [
-            "player",
-            "club",
-            "final_score",
-            "archetype_label",
-            "strongest_category",
-            "weakest_category",
-            "gate_margin",
-            "analyst_note",
+    explanation_table = (
+        score_explanation[
+            [
+                "player",
+                "club",
+                "final_score",
+                "archetype_label",
+                "strongest_football_category",
+                "weakest_football_category",
+                "gate_margin",
+                "analyst_note",
+            ]
         ]
-    ].head(12)
-    watchlist_table = watchlist[
-        [
-            "player",
-            "squad",
-            "control_midfielder_score",
-            "defensive_protection",
-            "gate_margin",
-            "lowest_category",
-            "availability_note",
-        ]
-    ].rename(
-        columns={
-            "player": "Player",
-            "squad": "Club",
-            "control_midfielder_score": "Score",
-            "defensive_protection": "Defence",
-            "gate_margin": "Gate margin",
-            "lowest_category": "Lowest category",
-            "availability_note": "Context note",
-        }
+        .rename(
+            columns={
+                "player": "Player",
+                "club": "Club",
+                "final_score": "Score",
+                "archetype_label": "Archetype",
+                "strongest_football_category": "Strongest football category",
+                "weakest_football_category": "Weakest football category",
+                "gate_margin": "Gate margin",
+                "analyst_note": "Analyst note",
+            }
+        )
+        .head(12)
     )
-    sensitivity_table = sensitivity[
-        [
-            "player",
-            "rank_base",
-            "rank_defensive_heavy",
-            "rank_possession_heavy",
-            "rank_transition_heavy",
-            "rank_progression_heavy",
-            "rank_equal_weight",
-            "rank_range",
-            "rank_stability_score",
+
+    def make_watchlist_table(source: pd.DataFrame) -> pd.DataFrame:
+        if source.empty:
+            return pd.DataFrame(
+                columns=[
+                    "Player",
+                    "Club",
+                    "Score",
+                    "Defence",
+                    "Security",
+                    "Progression",
+                    "Gate margin",
+                    "Context note",
+                ]
+            )
+        return source[
+            [
+                "player",
+                "squad",
+                "control_midfielder_score",
+                "defensive_protection",
+                "possession_security",
+                "progressive_value",
+                "gate_margin",
+                "availability_note",
+            ]
+        ].rename(
+            columns={
+                "player": "Player",
+                "squad": "Club",
+                "control_midfielder_score": "Score",
+                "defensive_protection": "Defence",
+                "possession_security": "Security",
+                "progressive_value": "Progression",
+                "gate_margin": "Gate margin",
+                "availability_note": "Context note",
+            }
+        )
+
+    borderline_watchlist_table = make_watchlist_table(borderline_watchlist)
+    role_mismatch_watchlist_table = make_watchlist_table(role_mismatch_watchlist)
+    sensitivity_table = (
+        sensitivity[
+            [
+                "player",
+                "rank_base",
+                "rank_defensive_heavy",
+                "rank_possession_heavy",
+                "rank_transition_heavy",
+                "rank_progression_heavy",
+                "rank_equal_weight",
+                "average_rank",
+                "rank_range",
+                "rank_volatility_score",
+            ]
         ]
-    ].head(12)
+        .rename(
+            columns={
+                "player": "Player",
+                "rank_base": "Base",
+                "rank_defensive_heavy": "Def-heavy",
+                "rank_possession_heavy": "Poss-heavy",
+                "rank_transition_heavy": "Trans-heavy",
+                "rank_progression_heavy": "Prog-heavy",
+                "rank_equal_weight": "Equal football",
+                "average_rank": "Average rank",
+                "rank_range": "Rank range",
+                "rank_volatility_score": "Rank volatility",
+            }
+        )
+        .head(12)
+    )
 
     html = f"""<!doctype html>
 <html lang="en">
@@ -467,13 +552,16 @@ def save_html_report(
         <p>A weight ranks players. A gate enforces a minimum requirement.</p>
         <p>Even though defensive protection has the highest single weight, a player can still score highly overall if he is elite in possession security and progression. For a Casemiro replacement profile, that creates a risk: the model could surface elegant possession players who do not have enough defensive evidence to survive United's midfield environment.</p>
         <p>The defensive gate should be read as a minimum-evidence filter, not as a final judgment on defensive ability. Palacios clears the defensive gate narrowly, so he should not be treated as a pure defensive replacement. Elliot Anderson falls just below the gate, so he should remain a watchlist player rather than be treated as definitively rejected.</p>
-        <p>This is why the report separates the published shortlist from the watchlist rather than deleting below-gate players entirely. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.</p>
+        <p>This is why the report separates the published shortlist, borderline watchlist, and role-mismatch watchlist rather than deleting below-gate players entirely. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.</p>
       </div>
     </section>
 
     <section>
       <div class="section-head"><h2>From Input Metrics to Category Scores</h2></div>
-      <div class="copy">{table_html(metrics_table_for_html(metric_dictionary))}</div>
+      <div class="copy">
+        <p>Positive inputs reward higher raw values. Inverted inputs reward lower raw values, which matters for events like fouls, cards, miscontrols, dispossessions, and turnover rate. The table below shows the exact raw column, direction, and transformation used for every configured input.</p>
+        {table_html(metrics_table_for_html(metric_dictionary))}
+      </div>
     </section>
 
     <section>
@@ -512,8 +600,8 @@ def save_html_report(
     </section>
 
     <section>
-      <div class="section-head"><h2>Casemiro and Ugarte References</h2></div>
-      <div class="copy"><p>Casemiro is an ageing defensive responsibility reference, not the clone target. Ugarte already covers much of the defence/security base, but his low progression score suggests United may still need a complementary midfielder who can add control without limiting progression.</p></div>
+      <div class="section-head"><h2>Reference Profiles: Casemiro and Ugarte</h2></div>
+      <div class="copy"><p>Casemiro and Ugarte are reference players, not targets in this screen. Casemiro is an ageing defensive responsibility reference, not the clone target. Ugarte already covers much of the defence/security base, but his low progression score suggests United may still need a complementary midfielder who can add control without limiting progression.</p></div>
       <div class="chart-card"><img class="chart" src="{chart_rel['radar']}" alt="Radar comparison"></div>
     </section>
 
@@ -524,7 +612,7 @@ def save_html_report(
         <p>Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.</p>
         <p>If Palacios drops in defensive-heavy scenarios, that confirms he is a control candidate whose defensive translation needs review. If Cardoso stays high across base, defensive-heavy, and possession-heavy scenarios, that supports his two-axis fit. If a player rises only in progression-heavy scenarios, he may be more of a progression specialist than a Casemiro replacement profile. If a player ranks well defensively but poorly in possession-heavy scenarios, he may recreate the original control problem.</p>
       </div>
-      <div class="chart-card"><img class="chart" src="{chart_rel['sensitivity_stability']}" alt="Sensitivity rank stability"></div>
+      <div class="chart-card"><img class="chart" src="{chart_rel['sensitivity_stability']}" alt="Sensitivity rank volatility"></div>
       <div class="copy">{table_html(sensitivity_table)}</div>
     </section>
 
@@ -535,10 +623,18 @@ def save_html_report(
     </section>
 
     <section>
-      <div class="section-head"><h2>Watchlist: Removed by Defensive Gate</h2></div>
+      <div class="section-head"><h2>Borderline Watchlist</h2></div>
       <div class="copy">
-        <p>These players remain analytically interesting. They are not rejected; they are moved to video/context review. The defensive gate is not a claim that players below the threshold cannot defend. It is a minimum-evidence filter for this specific role profile.</p>
-        {table_html(watchlist_table)}
+        <p>These players sit within five points below the defensive gate. They are not rejected; they are the names where video, tactical role context, and league translation matter most.</p>
+        {table_html(borderline_watchlist_table)}
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Role-Mismatch Watchlist</h2></div>
+      <div class="copy">
+        <p>These players remain analytically interesting, but their public-data defensive evidence sits further away from the minimum-evidence filter for this role profile. They may be better fits for different midfield briefs.</p>
+        {table_html(role_mismatch_watchlist_table)}
       </div>
     </section>
 
@@ -649,6 +745,8 @@ def save_pdf_report(
     scored: pd.DataFrame,
     shortlist: pd.DataFrame,
     watchlist: pd.DataFrame,
+    borderline_watchlist: pd.DataFrame,
+    role_mismatch_watchlist: pd.DataFrame,
     score_explanation: pd.DataFrame,
     sensitivity: pd.DataFrame,
     chart_paths: dict[str, Path],
@@ -718,6 +816,7 @@ def save_pdf_report(
             "transition_control",
             "possession_security",
             "progressive_value",
+            "age_availability",
             "gate_margin",
         ]
         _pdf_table_page(
@@ -734,26 +833,42 @@ def save_pdf_report(
                     "player",
                     "final_score",
                     "archetype_label",
-                    "strongest_category",
-                    "weakest_category",
+                    "strongest_football_category",
+                    "weakest_football_category",
                     "gate_margin",
                 ]
             ].head(12),
-            "Archetypes translate the model output into plain-English scouting priorities.",
+            "Archetypes translate the model output into plain-English scouting priorities. Strongest and weakest categories exclude age / availability so the football profile is clearer.",
         )
         _pdf_table_page(
             pdf,
-            "Watchlist Removed by Defensive Gate",
-            watchlist[
+            "Borderline Watchlist",
+            borderline_watchlist[
                 [
                     "player",
                     "squad",
                     "control_midfielder_score",
                     "defensive_protection",
+                    "possession_security",
                     "gate_margin",
                 ]
             ].head(10),
-            "Below-gate players are not deleted from the analysis; they are moved to video/context review.",
+            "Players within five points below the defensive gate are moved to video/context review rather than treated as rejected.",
+        )
+        _pdf_table_page(
+            pdf,
+            "Role-Mismatch Watchlist",
+            role_mismatch_watchlist[
+                [
+                    "player",
+                    "squad",
+                    "control_midfielder_score",
+                    "defensive_protection",
+                    "possession_security",
+                    "gate_margin",
+                ]
+            ].head(10),
+            "These players may be useful profiles, but their public-data defensive evidence is further from the minimum filter for this specific brief.",
         )
         _pdf_table_page(
             pdf,
@@ -764,11 +879,12 @@ def save_pdf_report(
                     "rank_base",
                     "rank_defensive_heavy",
                     "rank_possession_heavy",
+                    "average_rank",
                     "rank_range",
-                    "rank_stability_score",
+                    "rank_volatility_score",
                 ]
             ].head(12),
-            "Rank stability indicates whether the shortlist depends too heavily on one subjective weighting choice.",
+            "Average rank and rank volatility show whether the shortlist depends too heavily on one subjective weighting choice.",
         )
     return path
 

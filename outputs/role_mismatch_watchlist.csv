@@ -1,5 +1,4 @@
 rank,player,squad,league,age,control_midfielder_score,defensive_protection,transition_control,possession_security,progressive_value,age_availability,passed_defensive_gate,gate_margin,gate_status,lowest_category,lowest_category_score,availability_note
-4,Elliot Anderson,Nottingham Forest,Premier League,23,61.66,42.5,65.0,67.14,80.83,75.0,False,-2.5,Borderline / video review,defensive_protection,42.5,"May 2026 EPL target pool: high-cost controller, availability caveat"
 7,Angelo Stiller,Stuttgart,Bundesliga,25,56.68,8.33,60.71,95.0,78.33,70.0,False,-36.67,Watchlist: below gate,defensive_protection,8.33,High-volume passer
 10,Hugo Larsson,Eintracht Frankfurt,Bundesliga,21,54.29,38.75,60.71,66.43,54.17,55.0,False,-6.25,Watchlist: below gate,defensive_protection,38.75,Bundesliga target pool: young two-way controller
 12,Aleix García,Bayer Leverkusen,Bundesliga,28,53.21,6.67,55.0,88.57,83.33,56.25,False,-38.33,Watchlist: below gate,defensive_protection,6.67,"Bundesliga target pool: possession controller, lighter duelling profile"

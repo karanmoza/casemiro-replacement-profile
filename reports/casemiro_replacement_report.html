@@ -130,54 +130,282 @@
         <p>A weight ranks players. A gate enforces a minimum requirement.</p>
         <p>Even though defensive protection has the highest single weight, a player can still score highly overall if he is elite in possession security and progression. For a Casemiro replacement profile, that creates a risk: the model could surface elegant possession players who do not have enough defensive evidence to survive United's midfield environment.</p>
         <p>The defensive gate should be read as a minimum-evidence filter, not as a final judgment on defensive ability. Palacios clears the defensive gate narrowly, so he should not be treated as a pure defensive replacement. Elliot Anderson falls just below the gate, so he should remain a watchlist player rather than be treated as definitively rejected.</p>
-        <p>This is why the report separates the published shortlist from the watchlist rather than deleting below-gate players entirely. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.</p>
+        <p>This is why the report separates the published shortlist, borderline watchlist, and role-mismatch watchlist rather than deleting below-gate players entirely. Borderline differences around the gate should be tested with video, tactical role context, league translation, and team style.</p>
       </div>
     </section>
 
     <section>
       <div class="section-head"><h2>From Input Metrics to Category Scores</h2></div>
-      <div class="copy"><table border="1" class="dataframe data-table">
+      <div class="copy">
+        <p>Positive inputs reward higher raw values. Inverted inputs reward lower raw values, which matters for events like fouls, cards, miscontrols, dispossessions, and turnover rate. The table below shows the exact raw column, direction, and transformation used for every configured input.</p>
+        <table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
       <th>Category</th>
-      <th>Input metrics</th>
+      <th>Input metric</th>
+      <th>Raw column</th>
+      <th>Direction</th>
       <th>Transformation</th>
-      <th>What it means</th>
+      <th>Football meaning</th>
+      <th>Caveat</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Age / availability</td>
-      <td>age_score, minutes_score</td>
-      <td>Percentile / inverse percentile</td>
-      <td>Rewards players in a more useful squad-building age band. Rewards players with enough recent minutes to make the signal more reliable.</td>
+      <td>Defensive protection</td>
+      <td>Tackles Interceptions Per90</td>
+      <td>tackles_interceptions_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures ball-winning activity and defensive involvement.</td>
+      <td>Activity volume is role- and team-state dependent.</td>
     </tr>
     <tr>
       <td>Defensive protection</td>
-      <td>tackles_interceptions_per90, interceptions_per90, dribblers_tackled_pct, blocks_per90, aerial_duel_win_pct, def_mid_third_actions_per90</td>
-      <td>Percentile / inverse percentile</td>
-      <td>Captures ball-winning activity and defensive involvement. Captures anticipation and ability to cut passing lanes.</td>
+      <td>Interceptions Per90</td>
+      <td>interceptions_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures anticipation and ability to cut passing lanes.</td>
+      <td>Can be inflated by teams defending deeper or without the ball.</td>
     </tr>
     <tr>
-      <td>Possession security</td>
-      <td>pass_completion_pct, short_medium_pass_completion_pct, passes_received_per90, touches_per90, dispossessed_per_touch, miscontrols_per_touch, turnover_rate</td>
-      <td>Percentile / inverse percentile</td>
-      <td>Captures basic reliability in possession. Captures security in circulation phases.</td>
+      <td>Defensive protection</td>
+      <td>Dribblers Tackled Pct</td>
+      <td>dribblers_tackled_pct</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures one-v-one defensive reliability.</td>
+      <td>Does not show how often a player is isolated.</td>
     </tr>
     <tr>
-      <td>Progressive value</td>
-      <td>progressive_passes_per90, progressive_carries_per90, passes_into_final_third_per90, carries_into_final_third_per90, progressive_passing_distance_per90, live_ball_sca_per90</td>
-      <td>Percentile / inverse percentile</td>
-      <td>Captures forward passing value. Captures ability to move possession forward by carrying.</td>
+      <td>Defensive protection</td>
+      <td>Blocks Per90</td>
+      <td>blocks_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures defensive presence in lanes and around the box.</td>
+      <td>Blocks can reflect exposure as much as quality.</td>
+    </tr>
+    <tr>
+      <td>Defensive protection</td>
+      <td>Aerial Duel Win Pct</td>
+      <td>aerial_duel_win_pct</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures physical defensive floor.</td>
+      <td>Aerial volume and opponent targeting are not captured here.</td>
+    </tr>
+    <tr>
+      <td>Defensive protection</td>
+      <td>Def Mid Third Actions Per90</td>
+      <td>def_mid_third_actions_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures activity in zones relevant to a deeper midfielder.</td>
+      <td>Zone definitions vary across public providers.</td>
     </tr>
     <tr>
       <td>Transition control</td>
-      <td>ball_recoveries_per90, pressure_regains_per90, def_actions_after_loss_per90, fouls_committed_per90, cards_per90, miscontrols_per90, dispossessed_per90</td>
-      <td>Percentile / inverse percentile</td>
-      <td>Captures ability to regain loose balls and stabilize broken play. Captures whether the player helps stop counters early.</td>
+      <td>Ball Recoveries Per90</td>
+      <td>ball_recoveries_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures ability to regain loose balls and stabilize broken play.</td>
+      <td>Recoveries are partly created by team pressing structure.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Pressure Regains Per90</td>
+      <td>pressure_regains_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures whether the player helps stop counters early.</td>
+      <td>Public aggregate sources do not define pressure regains identically.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Def Actions After Loss Per90</td>
+      <td>def_actions_after_loss_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures reaction immediately after possession changes.</td>
+      <td>Best treated as a proxy without full event-sequence context.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Fouls Committed Per90</td>
+      <td>fouls_committed_per90</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; repeated fouling can indicate late control or transition stress.</td>
+      <td>Some tactical fouling is deliberate and context dependent.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Cards Per90</td>
+      <td>cards_per90</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; discipline matters for a deeper midfielder.</td>
+      <td>Refereeing and league context affect card rates.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Miscontrols Per90</td>
+      <td>miscontrols_per90</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; poor control can trigger transitions.</td>
+      <td>Miscontrol definitions vary by provider.</td>
+    </tr>
+    <tr>
+      <td>Transition control</td>
+      <td>Dispossessed Per90</td>
+      <td>dispossessed_per90</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; being dispossessed in midfield creates defensive exposure.</td>
+      <td>High-touch players face more opportunities to be dispossessed.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Pass Completion Pct</td>
+      <td>pass_completion_pct</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures basic reliability in possession.</td>
+      <td>Completion rate does not separate easy passes from pressured passes.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Short Medium Pass Completion Pct</td>
+      <td>short_medium_pass_completion_pct</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures security in circulation phases.</td>
+      <td>Can be boosted by low-risk team structures.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Passes Received Per90</td>
+      <td>passes_received_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures availability to receive and connect play.</td>
+      <td>Team possession share affects receiving volume.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Touches Per90</td>
+      <td>touches_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures involvement and ability to stay connected to possession.</td>
+      <td>Volume should be paired with turnover safety.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Dispossessed Per Touch</td>
+      <td>dispossessed_per_touch</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; captures ball security relative to involvement.</td>
+      <td>Does not identify pitch location of dispossessions.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Miscontrols Per Touch</td>
+      <td>miscontrols_per_touch</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; captures technical security under involvement.</td>
+      <td>Does not distinguish pressure level.</td>
+    </tr>
+    <tr>
+      <td>Possession security</td>
+      <td>Turnover Rate</td>
+      <td>turnover_rate</td>
+      <td>Inverted input: lower raw value scores better</td>
+      <td>Inverse percentile score</td>
+      <td>Lower is better; central midfield turnovers create transition risk.</td>
+      <td>Combines multiple public turnover proxies.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Progressive Passes Per90</td>
+      <td>progressive_passes_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures forward passing value.</td>
+      <td>Progressive pass definitions vary by source.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Progressive Carries Per90</td>
+      <td>progressive_carries_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures ability to move possession forward by carrying.</td>
+      <td>Carrying volume depends on role and team spacing.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Passes Into Final Third Per90</td>
+      <td>passes_into_final_third_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures territory-gaining passing.</td>
+      <td>Final-third entries do not measure pass difficulty.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Carries Into Final Third Per90</td>
+      <td>carries_into_final_third_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures territory-gaining carrying.</td>
+      <td>May favor players in more open transition systems.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Progressive Passing Distance Per90</td>
+      <td>progressive_passing_distance_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Captures volume and distance of forward passing.</td>
+      <td>Long-distance progression is not always better than secure circulation.</td>
+    </tr>
+    <tr>
+      <td>Progressive value</td>
+      <td>Live Ball Sca Per90</td>
+      <td>live_ball_sca_per90</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Low-weight proxy for useful possession contribution near chance creation.</td>
+      <td>This is not a creator search; it is only a supporting signal.</td>
+    </tr>
+    <tr>
+      <td>Age / availability</td>
+      <td>Age Score</td>
+      <td>age_score</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Rewards players in a more useful squad-building age band.</td>
+      <td>Age is a proxy, not a medical or development projection.</td>
+    </tr>
+    <tr>
+      <td>Age / availability</td>
+      <td>Minutes Score</td>
+      <td>minutes_score</td>
+      <td>Positive input: higher raw value scores better</td>
+      <td>Percentile score</td>
+      <td>Rewards players with enough recent minutes to make the signal more reliable.</td>
+      <td>Minutes do not replace injury-history or medical review.</td>
     </tr>
   </tbody>
-</table></div>
+</table>
+      </div>
     </section>
 
     <section>
@@ -196,6 +424,7 @@
       <th>Transition</th>
       <th>Security</th>
       <th>Progression</th>
+      <th>Age / availability</th>
       <th>Gate margin</th>
     </tr>
   </thead>
@@ -211,12 +440,13 @@
       <td>79.29</td>
       <td>99.29</td>
       <td>85.83</td>
+      <td>40.00</td>
       <td>2.50</td>
     </tr>
     <tr>
       <td>2</td>
       <td>Johnny Cardoso</td>
-      <td>Atletico Madrid</td>
+      <td>Atlético Madrid</td>
       <td>La Liga</td>
       <td>24</td>
       <td>70.00</td>
@@ -224,6 +454,7 @@
       <td>63.57</td>
       <td>71.43</td>
       <td>57.50</td>
+      <td>42.50</td>
       <td>40.00</td>
     </tr>
     <tr>
@@ -237,6 +468,7 @@
       <td>51.07</td>
       <td>55.71</td>
       <td>55.00</td>
+      <td>62.50</td>
       <td>24.17</td>
     </tr>
     <tr>
@@ -250,6 +482,7 @@
       <td>59.29</td>
       <td>47.86</td>
       <td>8.33</td>
+      <td>35.00</td>
       <td>50.83</td>
     </tr>
     <tr>
@@ -263,6 +496,7 @@
       <td>52.86</td>
       <td>56.43</td>
       <td>55.83</td>
+      <td>57.50</td>
       <td>15.00</td>
     </tr>
     <tr>
@@ -276,6 +510,7 @@
       <td>61.43</td>
       <td>50.00</td>
       <td>67.50</td>
+      <td>32.50</td>
       <td>5.00</td>
     </tr>
     <tr>
@@ -289,6 +524,7 @@
       <td>57.86</td>
       <td>51.43</td>
       <td>42.50</td>
+      <td>47.50</td>
       <td>12.50</td>
     </tr>
     <tr>
@@ -302,6 +538,7 @@
       <td>52.86</td>
       <td>24.29</td>
       <td>45.00</td>
+      <td>72.50</td>
       <td>22.50</td>
     </tr>
     <tr>
@@ -315,6 +552,7 @@
       <td>50.71</td>
       <td>25.71</td>
       <td>55.83</td>
+      <td>66.25</td>
       <td>6.25</td>
     </tr>
     <tr>
@@ -328,6 +566,7 @@
       <td>44.29</td>
       <td>6.43</td>
       <td>35.83</td>
+      <td>60.00</td>
       <td>30.00</td>
     </tr>
     <tr>
@@ -341,6 +580,7 @@
       <td>25.00</td>
       <td>14.29</td>
       <td>16.67</td>
+      <td>50.00</td>
       <td>10.00</td>
     </tr>
   </tbody>
@@ -377,8 +617,8 @@
     </section>
 
     <section>
-      <div class="section-head"><h2>Casemiro and Ugarte References</h2></div>
-      <div class="copy"><p>Casemiro is an ageing defensive responsibility reference, not the clone target. Ugarte already covers much of the defence/security base, but his low progression score suggests United may still need a complementary midfielder who can add control without limiting progression.</p></div>
+      <div class="section-head"><h2>Reference Profiles: Casemiro and Ugarte</h2></div>
+      <div class="copy"><p>Casemiro and Ugarte are reference players, not targets in this screen. Casemiro is an ageing defensive responsibility reference, not the clone target. Ugarte already covers much of the defence/security base, but his low progression score suggests United may still need a complementary midfielder who can add control without limiting progression.</p></div>
       <div class="chart-card"><img class="chart" src="charts/casemiro_candidate_radar.png" alt="Radar comparison"></div>
     </section>
 
@@ -389,20 +629,21 @@
         <p>Sensitivity analysis is used because the category weights are transparent but still subjective. If a candidate only ranks well under one weighting scheme, the model is telling us that the recommendation is fragile. If a candidate stays high across multiple schemes, the player is a more robust scouting priority.</p>
         <p>If Palacios drops in defensive-heavy scenarios, that confirms he is a control candidate whose defensive translation needs review. If Cardoso stays high across base, defensive-heavy, and possession-heavy scenarios, that supports his two-axis fit. If a player rises only in progression-heavy scenarios, he may be more of a progression specialist than a Casemiro replacement profile. If a player ranks well defensively but poorly in possession-heavy scenarios, he may recreate the original control problem.</p>
       </div>
-      <div class="chart-card"><img class="chart" src="charts/sensitivity_rank_stability.png" alt="Sensitivity rank stability"></div>
+      <div class="chart-card"><img class="chart" src="charts/sensitivity_rank_stability.png" alt="Sensitivity rank volatility"></div>
       <div class="copy"><table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
       <th>scenario</th>
-      <th>player</th>
-      <th>rank_base</th>
-      <th>rank_defensive_heavy</th>
-      <th>rank_possession_heavy</th>
-      <th>rank_transition_heavy</th>
-      <th>rank_progression_heavy</th>
-      <th>rank_equal_weight</th>
-      <th>rank_range</th>
-      <th>rank_stability_score</th>
+      <th>Player</th>
+      <th>Base</th>
+      <th>Def-heavy</th>
+      <th>Poss-heavy</th>
+      <th>Trans-heavy</th>
+      <th>Prog-heavy</th>
+      <th>Equal football</th>
+      <th>Average rank</th>
+      <th>Rank range</th>
+      <th>Rank volatility</th>
     </tr>
   </thead>
   <tbody>
@@ -415,8 +656,9 @@
       <td>1</td>
       <td>1</td>
       <td>1</td>
+      <td>1.17</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -427,8 +669,9 @@
       <td>2</td>
       <td>2</td>
       <td>2</td>
+      <td>1.83</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -439,8 +682,9 @@
       <td>3</td>
       <td>3</td>
       <td>3</td>
+      <td>3.17</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -451,8 +695,9 @@
       <td>5</td>
       <td>5</td>
       <td>4</td>
+      <td>4.67</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -463,8 +708,9 @@
       <td>4</td>
       <td>7</td>
       <td>6</td>
+      <td>4.83</td>
       <td>4</td>
-      <td>0.0</td>
+      <td>100.0</td>
     </tr>
     <tr>
       <th></th>
@@ -475,8 +721,9 @@
       <td>6</td>
       <td>4</td>
       <td>5</td>
+      <td>5.67</td>
       <td>3</td>
-      <td>25.0</td>
+      <td>75.0</td>
     </tr>
     <tr>
       <th></th>
@@ -487,8 +734,9 @@
       <td>7</td>
       <td>6</td>
       <td>7</td>
+      <td>6.67</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -499,8 +747,9 @@
       <td>8</td>
       <td>8</td>
       <td>8</td>
+      <td>8.00</td>
       <td>0</td>
-      <td>100.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th></th>
@@ -511,8 +760,9 @@
       <td>9</td>
       <td>9</td>
       <td>9</td>
+      <td>9.17</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -523,8 +773,9 @@
       <td>10</td>
       <td>10</td>
       <td>10</td>
+      <td>9.83</td>
       <td>1</td>
-      <td>75.0</td>
+      <td>25.0</td>
     </tr>
     <tr>
       <th></th>
@@ -535,8 +786,9 @@
       <td>11</td>
       <td>11</td>
       <td>11</td>
+      <td>11.00</td>
       <td>0</td>
-      <td>100.0</td>
+      <td>0.0</td>
     </tr>
   </tbody>
 </table></div>
@@ -548,14 +800,14 @@
       <div class="copy"><table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
-      <th>player</th>
-      <th>club</th>
-      <th>final_score</th>
-      <th>archetype_label</th>
-      <th>strongest_category</th>
-      <th>weakest_category</th>
-      <th>gate_margin</th>
-      <th>analyst_note</th>
+      <th>Player</th>
+      <th>Club</th>
+      <th>Score</th>
+      <th>Archetype</th>
+      <th>Strongest football category</th>
+      <th>Weakest football category</th>
+      <th>Gate margin</th>
+      <th>Analyst note</th>
     </tr>
   </thead>
   <tbody>
@@ -565,19 +817,19 @@
       <td>73.77</td>
       <td>Control profile</td>
       <td>possession_security</td>
-      <td>age_availability</td>
+      <td>defensive_protection</td>
       <td>2.50</td>
-      <td>Borderline defensive-gate profile; strongest in possession security, weakest in age availability. Role and video review should test defensive translation.</td>
+      <td>Borderline defensive-gate profile; strongest in possession security, weakest in defensive protection. Role and video review should test defensive translation.</td>
     </tr>
     <tr>
       <td>Johnny Cardoso</td>
-      <td>Atletico Madrid</td>
+      <td>Atlético Madrid</td>
       <td>70.00</td>
       <td>Two-axis defensive/security fit</td>
       <td>defensive_protection</td>
-      <td>age_availability</td>
+      <td>progressive_value</td>
       <td>40.00</td>
-      <td>Strongest in defensive protection; weakest in age availability. Use video to test role fit.</td>
+      <td>Strongest in defensive protection; weakest in progressive value. Use video to test role fit.</td>
     </tr>
     <tr>
       <td>Manuel Ugarte</td>
@@ -645,9 +897,9 @@
       <td>54.61</td>
       <td>Watchlist / role-context needed</td>
       <td>progressive_value</td>
-      <td>age_availability</td>
+      <td>defensive_protection</td>
       <td>5.00</td>
-      <td>Borderline defensive-gate profile; strongest in progressive value, weakest in age availability. Role and video review should test defensive translation.</td>
+      <td>Borderline defensive-gate profile; strongest in progressive value, weakest in defensive protection. Role and video review should test defensive translation.</td>
     </tr>
     <tr>
       <td>Hugo Larsson</td>
@@ -670,7 +922,7 @@
       <td>Strongest in transition control; weakest in progressive value. Use video to test role fit.</td>
     </tr>
     <tr>
-      <td>Aleix Garcia</td>
+      <td>Aleix García</td>
       <td>Bayer Leverkusen</td>
       <td>53.21</td>
       <td>Removed by defensive gate</td>
@@ -684,9 +936,9 @@
     </section>
 
     <section>
-      <div class="section-head"><h2>Watchlist: Removed by Defensive Gate</h2></div>
+      <div class="section-head"><h2>Borderline Watchlist</h2></div>
       <div class="copy">
-        <p>These players remain analytically interesting. They are not rejected; they are moved to video/context review. The defensive gate is not a claim that players below the threshold cannot defend. It is a minimum-evidence filter for this specific role profile.</p>
+        <p>These players sit within five points below the defensive gate. They are not rejected; they are the names where video, tactical role context, and league translation matter most.</p>
         <table border="1" class="dataframe data-table">
   <thead>
     <tr style="text-align: right;">
@@ -694,8 +946,9 @@
       <th>Club</th>
       <th>Score</th>
       <th>Defence</th>
+      <th>Security</th>
+      <th>Progression</th>
       <th>Gate margin</th>
-      <th>Lowest category</th>
       <th>Context note</th>
     </tr>
   </thead>
@@ -704,18 +957,43 @@
       <td>Elliot Anderson</td>
       <td>Nottingham Forest</td>
       <td>61.66</td>
-      <td>42.50</td>
-      <td>-2.50</td>
-      <td>defensive_protection</td>
+      <td>42.5</td>
+      <td>67.14</td>
+      <td>80.83</td>
+      <td>-2.5</td>
       <td>May 2026 EPL target pool: high-cost controller, availability caveat</td>
     </tr>
+  </tbody>
+</table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>Role-Mismatch Watchlist</h2></div>
+      <div class="copy">
+        <p>These players remain analytically interesting, but their public-data defensive evidence sits further away from the minimum-evidence filter for this role profile. They may be better fits for different midfield briefs.</p>
+        <table border="1" class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Player</th>
+      <th>Club</th>
+      <th>Score</th>
+      <th>Defence</th>
+      <th>Security</th>
+      <th>Progression</th>
+      <th>Gate margin</th>
+      <th>Context note</th>
+    </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>Angelo Stiller</td>
       <td>Stuttgart</td>
       <td>56.68</td>
       <td>8.33</td>
+      <td>95.00</td>
+      <td>78.33</td>
       <td>-36.67</td>
-      <td>defensive_protection</td>
       <td>High-volume passer</td>
     </tr>
     <tr>
@@ -723,17 +1001,19 @@
       <td>Eintracht Frankfurt</td>
       <td>54.29</td>
       <td>38.75</td>
+      <td>66.43</td>
+      <td>54.17</td>
       <td>-6.25</td>
-      <td>defensive_protection</td>
       <td>Bundesliga target pool: young two-way controller</td>
     </tr>
     <tr>
-      <td>Aleix Garcia</td>
+      <td>Aleix García</td>
       <td>Bayer Leverkusen</td>
       <td>53.21</td>
       <td>6.67</td>
+      <td>88.57</td>
+      <td>83.33</td>
       <td>-38.33</td>
-      <td>defensive_protection</td>
       <td>Bundesliga target pool: possession controller, lighter duelling profile</td>
     </tr>
     <tr>
@@ -741,8 +1021,9 @@
       <td>AC Milan</td>
       <td>49.23</td>
       <td>28.75</td>
+      <td>70.00</td>
+      <td>34.17</td>
       <td>-16.25</td>
-      <td>defensive_protection</td>
       <td>Serie A target pool: press-resistant possession profile</td>
     </tr>
     <tr>
@@ -750,8 +1031,9 @@
       <td>Newcastle United</td>
       <td>47.92</td>
       <td>27.50</td>
+      <td>52.14</td>
+      <td>85.83</td>
       <td>-17.50</td>
-      <td>defensive_protection</td>
       <td>Control creator, premium market</td>
     </tr>
     <tr>
@@ -759,8 +1041,9 @@
       <td>AC Milan</td>
       <td>38.15</td>
       <td>36.25</td>
+      <td>20.71</td>
+      <td>67.50</td>
       <td>-8.75</td>
-      <td>possession_security</td>
       <td>Serie A target pool: range, carries, and duels</td>
     </tr>
   </tbody>

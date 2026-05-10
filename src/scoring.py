@@ -227,6 +227,14 @@ def make_filtered_out_watchlist(scored: pd.DataFrame) -> pd.DataFrame:
     return excluded.loc[:, [col for col in columns if col in excluded.columns]]
 
 
+def split_watchlists(watchlist: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split below-gate players into borderline and role-mismatch watchlists."""
+
+    borderline = watchlist[watchlist["gate_margin"].between(-5, 0, inclusive="both")].copy()
+    role_mismatch = watchlist[~watchlist["player"].isin(borderline["player"])].copy()
+    return borderline, role_mismatch
+
+
 def make_shortlist(scored: pd.DataFrame, size: int = SHORTLIST_SIZE) -> pd.DataFrame:
     """Return top candidates with practical recruitment columns."""
 
@@ -292,8 +300,8 @@ def assign_archetype(row: pd.Series) -> str:
 def make_analyst_note(row: pd.Series) -> str:
     """Create a short plain-English note for report tables."""
 
-    strongest = row["strongest_category"].replace("_", " ")
-    weakest = row["weakest_category"].replace("_", " ")
+    strongest = row.get("strongest_football_category", row["strongest_category"]).replace("_", " ")
+    weakest = row.get("weakest_football_category", row["weakest_category"]).replace("_", " ")
     if not bool(row["passed_defensive_gate"]):
         return (
             f"Below the light defensive gate by {abs(row['gate_margin']):.1f} points; "
@@ -316,6 +324,9 @@ def make_player_score_explanation(scored: pd.DataFrame) -> pd.DataFrame:
         out[f"{category}_rank"] = out[category].rank(ascending=False, method="min").astype(int)
     out["strongest_category"] = out[category_cols].idxmax(axis=1)
     out["weakest_category"] = out[category_cols].idxmin(axis=1)
+    football_category_cols = [col for col in category_cols if col != "age_availability"]
+    out["strongest_football_category"] = out[football_category_cols].idxmax(axis=1)
+    out["weakest_football_category"] = out[football_category_cols].idxmin(axis=1)
     out["archetype_label"] = out.apply(assign_archetype, axis=1)
     out["analyst_note"] = out.apply(make_analyst_note, axis=1)
     cols = [
@@ -328,6 +339,8 @@ def make_player_score_explanation(scored: pd.DataFrame) -> pd.DataFrame:
         *[f"{category}_rank" for category in category_cols],
         "strongest_category",
         "weakest_category",
+        "strongest_football_category",
+        "weakest_football_category",
         "passed_defensive_gate",
         "gate_margin",
         "archetype_label",
@@ -410,11 +423,9 @@ def run_sensitivity_analysis(
     rank_pivot["average_rank"] = rank_pivot[rank_cols].mean(axis=1).round(2)
     max_range = rank_pivot["rank_range"].max()
     if pd.isna(max_range) or max_range == 0:
-        rank_pivot["rank_stability_score"] = 100.0
+        rank_pivot["rank_volatility_score"] = 0.0
     else:
-        rank_pivot["rank_stability_score"] = (
-            100 - (rank_pivot["rank_range"] / max_range * 100)
-        ).round(2)
+        rank_pivot["rank_volatility_score"] = (rank_pivot["rank_range"] / max_range * 100).round(2)
     rank_pivot = rank_pivot.reset_index()
     return rank_pivot.sort_values(["average_rank", "rank_base"]).reset_index(drop=True)
 

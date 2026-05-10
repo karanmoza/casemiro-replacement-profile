@@ -100,7 +100,7 @@ PLAYER_CONTEXT_MAY_2026 = {
     },
     "Johnny Cardoso": {
         "date_of_birth": "2001-09-20",
-        "squad": "Atletico Madrid",
+        "squad": "Atlético Madrid",
         "league": "La Liga",
         "context_source": "Public profile checked May 2026",
         "context_source_url": "https://en.wikipedia.org/wiki/Johnny_Cardoso",
@@ -154,7 +154,7 @@ PLAYER_CONTEXT_MAY_2026 = {
         "context_source": "Eintracht/UEFA profile checked May 2026",
         "context_source_url": "https://en.eintracht.de/2024-2025/squad/hugo-larsson/",
     },
-    "Aleix Garcia": {
+    "Aleix García": {
         "date_of_birth": "1997-06-28",
         "squad": "Bayer Leverkusen",
         "league": "Bundesliga",
@@ -530,7 +530,7 @@ SAMPLE_PLAYERS = [
     },
     {
         "player": "Johnny Cardoso",
-        "squad": "Atletico Madrid",
+        "squad": "Atlético Madrid",
         "league": "La Liga",
         "age": 24,
         "is_target_candidate": True,
@@ -793,7 +793,7 @@ SAMPLE_PLAYERS = [
         "live_ball_sca": 46,
     },
     {
-        "player": "Aleix Garcia",
+        "player": "Aleix García",
         "squad": "Bayer Leverkusen",
         "league": "Bundesliga",
         "age": 28,
