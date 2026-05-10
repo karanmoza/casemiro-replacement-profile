@@ -416,7 +416,7 @@ def save_html_report(
                 "rank_equal_weight": "Equal football",
                 "average_rank": "Average rank",
                 "rank_range": "Rank range",
-                "rank_volatility_score": "Rank volatility",
+                "rank_volatility_score": "Rank volatility (lower = stabler)",
             }
         )
         .head(12)
@@ -894,7 +894,9 @@ def save_pdf_report(
                     "rank_range",
                     "rank_volatility_score",
                 ]
-            ].head(12),
+            ]
+            .rename(columns={"rank_volatility_score": "rank_volatility_lower_stabler"})
+            .head(12),
             "Average rank and rank volatility show whether the shortlist depends too heavily on one subjective weighting choice. Lower volatility is better only when the average rank is also strong.",
         )
         _pdf_text_page(

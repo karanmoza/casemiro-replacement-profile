@@ -156,6 +156,10 @@ Lower rank volatility means the player's rank is more stable across weighting sc
 
 The final score uses all five categories, but the diagnostic charts intentionally use smaller subsets of input metrics. This avoids every plot telling the same story and helps identify why a player scores well: defensive activity, possession security, transition safety, or progression type.
 
+## Substack Adaptation Note
+
+The full HTML/PDF/GitHub report keeps the complete input-metric dictionary for auditability. For a Substack article, use a shorter methodology table with only `Category`, `Football question`, and `Example inputs`, then link back to the GitHub report for the full metric dictionary.
+
 ## Outputs
 
 Reports:

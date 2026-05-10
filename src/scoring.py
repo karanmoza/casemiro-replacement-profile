@@ -298,8 +298,8 @@ def assign_archetype(row: pd.Series) -> str:
     if defence >= 65 and security < 40:
         return "Low-control defensive specialist"
     if abs(gate_margin) <= 5:
-        return "Watchlist / role-context needed"
-    return "Watchlist / role-context needed"
+        return "Context-dependent fit"
+    return "Context-dependent fit"
 
 
 def make_analyst_note(row: pd.Series) -> str:
